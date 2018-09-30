@@ -60,13 +60,13 @@ public @Component class InitStartApi {
 				"  `\"bmmd\"' .JML. `'  .JMML.    .JMML.     .JMML. .JMM..AMA.   .AMMA..JML. `'  .JMML..JMMmmmmMMM \r\n" + 
 				"      MMb                                                                                       \r\n" + 
 				"       `bood'                                                                                   "
-				+ "\r\n浅梦gitHub:https://github.com/starczt1992/JavaSSM_QMFrame");
+				+ "\r\n浅梦gitHub:https://github.com/starmcc/QMFrameSSM");
 
 	}
 	
 	
 	@PreDestroy
 	public void preDestroy() {
-		QmLog.debug("浅梦gitHub:https://github.com/starczt1992/JavaSSM_QMFrame");
+		QmLog.debug("浅梦gitHub:https://github.com/starmcc/QMFrameSSM");
 	}
 }
