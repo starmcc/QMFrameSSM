@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<!-- 设置全映射 -->
+		<setting name="autoMappingBehavior" value="FULL"/>
+		<!-- 设置LOG4J的SQL打印,运行环境中请设为NO_LOGGING -->
+ 		<setting name="logImpl" value="STDOUT_LOGGING" />
+ 		<!-- SLF4J | LOG4J | LOG4J2 | JDK_LOGGING | COMMONS_LOGGING | STDOUT_LOGGING | NO_LOGGING -->
+	</settings>
+	<!-- mybatis实体类映射 -->
+	<typeAliases>
+		<!-- 请根据实际开发包中的实体类包路径进行配置 -->
+		<package name="com.qm.dev.entity" />
+		<!-- code为框架包，请勿修改 -->
+		<package name="com.qm.code.entity" />
+	</typeAliases>
+    <plugins>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <!-- config params as the following -->
+            <!-- 分页参数合理化,如果为false则大于最后一页的返回空 -->
+            <property name="reasonable" value="false"/>
+        </plugin>
+    </plugins>
+</configuration>
