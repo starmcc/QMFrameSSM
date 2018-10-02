@@ -7,7 +7,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
 
-import com.qm.code.entity.usermanager.QmRole;
+import com.qm.code.entity.usermanager.Qmbject;
 import com.qm.code.util.io.PropertiesUtil;
 
 /**
@@ -25,26 +25,14 @@ public class QmLoginOnLine implements HttpSessionBindingListener {
 	/**
 	 * 该属性为用户对象
 	 */
-	private Object object = null;
-	/**
-	 * 该属性为角色id
-	 */
-	private QmRole qmRole = null;
+	private Qmbject qmbject = null;
 
-	public Object getObject() {
-		return object;
+	public Qmbject getQmbject() {
+		return qmbject;
 	}
 
-	public void setObject(Object object) {
-		this.object = object;
-	}
-
-	public QmRole getQmRole() {
-		return qmRole;
-	}
-
-	public void setQmRole(QmRole qmRole) {
-		this.qmRole = qmRole;
+	public void setQmbject(Qmbject qmbject) {
+		this.qmbject = qmbject;
 	}
 
 	public void valueBound(HttpSessionBindingEvent event) {
@@ -55,8 +43,8 @@ public class QmLoginOnLine implements HttpSessionBindingListener {
 		if (loginLis == null) {
 			loginLis = new ArrayList<Object>();
 		}
-		loginLis.add(object);
-		application.setAttribute(APPLICATION_LIST_KEY, object);
+		loginLis.add(qmbject.getBean());
+		application.setAttribute(APPLICATION_LIST_KEY, qmbject);
 		// ------------------业务处理---------------------
 	}
 
@@ -66,7 +54,7 @@ public class QmLoginOnLine implements HttpSessionBindingListener {
 		ServletContext application = event.getSession().getServletContext();
 		List<Object> userList = (List<Object>) application.getAttribute(APPLICATION_LIST_KEY);
 		if (userList != null) {
-			userList.remove(object);
+			userList.remove(qmbject.getBean());
 		}
 		// 可在此添加业务处理
 

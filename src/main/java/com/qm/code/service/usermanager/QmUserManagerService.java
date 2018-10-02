@@ -1,6 +1,7 @@
 package com.qm.code.service.usermanager;
 
 import java.util.List;
+import java.util.Map;
 
 import com.qm.code.entity.usermanager.QmLogger;
 import com.qm.code.entity.usermanager.QmPower;
@@ -12,14 +13,24 @@ import com.qm.code.entity.usermanager.QmRole;
  * @Description 用户管理器业务层
  */
 public interface QmUserManagerService {
+
 	/**
-	 * 获取用户角色
+	 * 登录
+	 * 
+	 * @param userName
+	 * @param password
+	 * @return
+	 */
+	Map<String, Object> login(String sql, String userName, String password);
+
+	/**
+	 * 获取角色
 	 * 
 	 * @param tableName
 	 * @param roleId
 	 * @return
 	 */
-	QmRole getRole(String tableName, Integer roleId);
+	List<QmRole> getRole(String tableName, QmRole qmRole);
 
 	/**
 	 * 获取用户角色权限列表
@@ -36,7 +47,7 @@ public interface QmUserManagerService {
 	 * @param qmRole
 	 * @return
 	 */
-	Integer changeRole(String tableName, QmRole qmRole);
+	Integer changeTableRole(String tableName, QmRole qmRole);
 
 	/**
 	 * 添加库中角色
@@ -45,7 +56,7 @@ public interface QmUserManagerService {
 	 * @param qmRole
 	 * @return
 	 */
-	Integer addRole(String tableName, QmRole qmRole);
+	Integer addTableRole(String tableName, QmRole qmRole);
 
 	/**
 	 * 删除库中角色
@@ -54,13 +65,14 @@ public interface QmUserManagerService {
 	 * @param qmRole
 	 * @return
 	 */
-	Integer delRole(String tableName, Integer roleId);
-	
+	Integer delTableRole(String tableName, Integer roleId);
+
 	/**
 	 * 添加日志
+	 * 
 	 * @param qmLogger
 	 * @return
 	 */
-	Integer addUserLogger(String tableName,QmLogger qmLogger);
-	
+	Integer addUserLogger(String tableName, QmLogger qmLogger);
+
 }

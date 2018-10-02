@@ -50,10 +50,6 @@
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
-		<!-- request获取支持 -->
-	<listener>
-		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
-	</listener>
 	<servlet>
 		<servlet-name>SpringMVC</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
@@ -63,7 +59,10 @@
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
-
+		<!-- request获取支持 -->
+	<listener>
+		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+	</listener>
 	<servlet-mapping>
 		<servlet-name>SpringMVC</servlet-name>
 		<url-pattern>/</url-pattern>

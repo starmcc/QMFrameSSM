@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletContext;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpSession;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.cglib.beans.BeanMap;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -20,6 +22,7 @@ import org.springframework.web.method.HandlerMethod;
 import com.qm.code.entity.usermanager.QmLogger;
 import com.qm.code.entity.usermanager.QmPower;
 import com.qm.code.entity.usermanager.QmRole;
+import com.qm.code.entity.usermanager.Qmbject;
 import com.qm.code.listener.QmLoginOnLine;
 import com.qm.code.note.QmUserManagerAPI;
 import com.qm.code.service.usermanager.QmUserManagerService;
@@ -28,9 +31,9 @@ import com.qm.code.util.io.PropertiesUtil;
 /**
  * @author 浅梦工作室
  * @createDate 2018年9月28日 下午11:59:23
- * @Description 用户管理器
+ * @Description QM用户管理器
  */
-public @Component("qmUserManager") class QmUserManager {
+public @Component class QmUserManager {
 	/**
 	 * 用户管理器是否开启
 	 */
@@ -71,56 +74,86 @@ public @Component("qmUserManager") class QmUserManager {
 	 * 用户操作日志是否开启
 	 */
 	public static final String MANAGER_USER_LOGGER = PropertiesUtil.get("QmUserManager.user.logger");
+
+	public static String LOGIN_SQL = PropertiesUtil.get("QmUserManager.login.sql");
 	/**
-	 * 监听工具
+	 * 监听器
 	 */
-	private static QmLoginOnLine onLine;
+	private QmLoginOnLine onLine;
 	
 	private HttpServletRequest request;
-	
+
 	public QmUserManager() {
-		
+
 	}
-	
+
 	@Resource
 	private QmUserManagerService qmUserManagerService;
-
+	
 	/**
-	 * 启动/更新用户对象和角色(登陆调用此方法)
-	 * @param request
+	 * 登录
+	 * 
 	 * @param bean
-	 * @param roleId
-	 * @return 如果找不到该角色返回-1,成功返回1,表字段错误返回0
+	 * @param userName
+	 * @param password
+	 * @return
+	 * @throws Exception
 	 */
-	public int start(Object bean, int roleId) {
+	public Qmbject login(Object bean, String userName, String password) throws Exception {
+		if (LOGIN_SQL == null) {
+			return null;
+		}
 		request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 		HttpSession session = request.getSession();
 		onLine = (QmLoginOnLine) session.getAttribute(SESSION_KEY);
 		if (onLine == null) {
 			onLine = new QmLoginOnLine();
 		}
-		QmRole qmRole;
-		try {
-			qmRole = qmUserManagerService.getRole(ROLE_TABLE_NAME, roleId);
-			if(qmRole == null) {
-				return -1;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return 0;
+		Map<String, Object> map = qmUserManagerService.login(LOGIN_SQL, userName, password);
+		BeanMap beanMap = BeanMap.create(bean);
+		beanMap.putAll(map);
+		if (bean == null) {
+			return null;
 		}
-		onLine.setQmRole(qmRole);
-		onLine.setObject(bean);
+		Qmbject qmbject = new Qmbject();
+		qmbject.setBean(bean);
+		onLine.setQmbject(qmbject);
+		session.setAttribute(SESSION_KEY, onLine);
+		return qmbject;
+	}
+
+	/**
+	 * 更新用户对象
+	 * 
+	 * @param qmbject
+	 * @return 如果找不到该角色返回-1,成功返回1,表字段错误返回0,-2
+	 */
+	public int setQmbject(Qmbject qmbject) {
+		request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+		HttpSession session = request.getSession();
+		onLine = (QmLoginOnLine) session.getAttribute(SESSION_KEY);
+		if (onLine == null) {
+			return -2;
+		}
+		if (qmbject.getQmRole() != null) {
+			try {
+				List<QmRole> qmRoleLis = qmUserManagerService.getRole(ROLE_TABLE_NAME, qmbject.getQmRole());
+				if (qmRoleLis == null || qmRoleLis.size() == 0) {
+					return -1;
+				}
+				qmbject.setQmRole(qmRoleLis.get(0));
+			} catch (Exception e) {
+				e.printStackTrace();
+				return 0;
+			}
+		}
+		onLine.setQmbject(qmbject);
 		session.setAttribute(SESSION_KEY, onLine);
 		return 1;
 	}
 
 	/**
 	 * 退出/登出用户(注销调用此方法)
-	 * 
-	 * @param request
-	 * @param bean
-	 * @param roleId
 	 */
 	public void exit() {
 		request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
@@ -131,127 +164,75 @@ public @Component("qmUserManager") class QmUserManager {
 	/**
 	 * 获取用户对象
 	 * 
-	 * @param request
 	 * @return
 	 */
-	public Object getUser() {
+	public Qmbject getQmbject() {
 		HttpSession session = request.getSession();
 		onLine = (QmLoginOnLine) session.getAttribute(SESSION_KEY);
 		if (onLine == null) {
 			return null;
 		}
-		return onLine.getObject();
-	}
-
-	/**
-	 * 获取用户角色
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public QmRole getRole() {
-		request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-		HttpSession session = request.getSession();
-		onLine = (QmLoginOnLine) session.getAttribute(SESSION_KEY);
-		if (onLine == null) {
-			return null;
-		}
-		return onLine.getQmRole();
+		return onLine.getQmbject();
 	}
 
 	/**
 	 * 修改表中角色
 	 * 
-	 * @param request
 	 * @param qmRole
 	 * @return
 	 */
-	public QmRole changeRole(QmRole qmRole) {
-		request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-		HttpSession session = request.getSession();
-		onLine = (QmLoginOnLine) session.getAttribute(SESSION_KEY);
-		if (onLine == null) {
-			return null;
-		}
-		int res = qmUserManagerService.changeRole(ROLE_TABLE_NAME, qmRole);
+	public boolean changeTableRole(QmRole qmRole) {
+		int res = qmUserManagerService.changeTableRole(ROLE_TABLE_NAME, qmRole);
 		if (res < 1) {
-			return null;
+			return false;
 		}
-		onLine.setQmRole(qmRole);
-		session.setAttribute(SESSION_KEY, onLine);
-		return onLine.getQmRole();
+		return true;
 	}
 
 	/**
 	 * 添加表中角色
 	 * 
-	 * @param request
 	 * @param qmRole
 	 * @return
 	 */
-	public QmRole addRole(QmRole qmRole) {
-		request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-		HttpSession session = request.getSession();
-		onLine = (QmLoginOnLine) session.getAttribute(SESSION_KEY);
-		if (onLine == null) {
-			return null;
-		}
-		int res = qmUserManagerService.addRole(ROLE_TABLE_NAME, qmRole);
+	public boolean addTableRole(QmRole qmRole) {
+		int res = qmUserManagerService.addTableRole(ROLE_TABLE_NAME, qmRole);
 		if (res < 1) {
-			return null;
+			return false;
 		}
-		onLine.setQmRole(qmRole);
-		session.setAttribute(SESSION_KEY, onLine);
-		return onLine.getQmRole();
+		return true;
 	}
 
 	/**
 	 * 删除表中角色
 	 * 
-	 * @param request
 	 * @param qmRole
 	 * @return
 	 */
-	public boolean delRole(Integer roleId) {
-		request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-		HttpSession session = request.getSession();
-		onLine = (QmLoginOnLine) session.getAttribute(SESSION_KEY);
-		int res = qmUserManagerService.delRole(ROLE_TABLE_NAME, roleId);
+	public boolean delTableRole(Integer roleId) {
+		int res = qmUserManagerService.delTableRole(ROLE_TABLE_NAME, roleId);
 		if (res < 1) {
 			return false;
-		}
-		if (onLine.getQmRole() != null) {
-			if (onLine.getQmRole().getRoleId() == roleId) {
-				onLine.setQmRole(null);
-				session.setAttribute(SESSION_KEY, onLine);
-			}
 		}
 		return true;
 	}
 
 	/**
-	 * 获取用户登录状态
+	 * 获取表中角色
 	 * 
-	 * @param request
+	 * @param qmRole
 	 * @return
 	 */
-	public boolean getLoginStatus(HttpServletRequest request) {
-		request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-		HttpSession session = request.getSession();
-		onLine = (QmLoginOnLine) session.getAttribute(SESSION_KEY);
-		if (onLine == null) {
-			return false;
-		}
-		return true;
+	public List<QmRole> getTableRoleList(QmRole qmRole) {
+		return qmUserManagerService.getRole(ROLE_TABLE_NAME, qmRole);
 	}
 
 	/**
 	 * 获取权限表
 	 * 
-	 * @param request
 	 * @return
 	 */
-	public List<QmPower> getPower(HttpServletRequest request) {
+	public List<QmPower> getPower() {
 		request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 		ServletContext application = request.getServletContext();
 		@SuppressWarnings("unchecked")
@@ -266,11 +247,10 @@ public @Component("qmUserManager") class QmUserManager {
 	/**
 	 * Filter登录控制,权限控制
 	 * 
-	 * @param request
 	 * @param handler
 	 * @return
 	 */
-	public boolean loginVerify(Object handler) {
+	public boolean loginFilterVerify(Object handler) {
 		request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 		if (MANAGER_OPEN.trim().equals("true")) {
 			if (handler instanceof HandlerMethod) {
@@ -279,15 +259,18 @@ public @Component("qmUserManager") class QmUserManager {
 				// 如果有这样的注释，则返回该注解的对象，否则null。
 				QmUserManagerAPI qmUserManagerAPI = method.getAnnotation(QmUserManagerAPI.class);
 				// 这里判断如果有注解的话,等于需要登录
+				Qmbject qmbject = getQmbject();
 				if (qmUserManagerAPI != null && qmUserManagerAPI.needLogin()) {
-					boolean loginStatus = getLoginStatus(request);
-					if (!loginStatus) {
+					if (qmbject == null) {
 						return false;
 					}
 					// 进入权限控制
 					if (MANAGER_POWER_OPEN.trim().equals("true")) {
 						if (qmUserManagerAPI.licence() != -1) {
-							QmRole qmRole = getRole();
+							if (qmbject.getQmRole() == null) {
+								return false;
+							}
+							QmRole qmRole = qmbject.getQmRole();
 							// 超级管理员是*
 							if (!qmRole.getPowerIds().trim().equals("*")) {
 								String[] userPowers = qmRole.getPowerIds().split(",");
@@ -318,38 +301,37 @@ public @Component("qmUserManager") class QmUserManager {
 		return true;
 	}
 
-	
 	/**
 	 * 获取当前正在登录的用户集合(可获取在线列表数,在线列表等)
-	 * @param request
+	 * 
 	 * @return
 	 */
-	public List<Object> getApplicationQmUser(HttpServletRequest request){
+	public List<Object> getApplicationQmUser() {
 		request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 		ServletContext application = request.getServletContext();
 		@SuppressWarnings("unchecked")
 		List<Object> list = (List<Object>) application.getAttribute(APPLICATION_LIST_KEY);
 		return list;
 	}
-	
-	
+
 	/**
 	 * 在AOP中打印日志
+	 * 
 	 * @param jp
 	 * @return
 	 */
-	public void doAopQmUserManagerLogger(JoinPoint jp,long time) {
+	public void doAopQmUserManagerLogger(JoinPoint jp, long time) {
 		request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-		if(!MANAGER_USER_LOGGER.trim().equals("true")) {
+		if (!MANAGER_USER_LOGGER.trim().equals("true")) {
 			return;
 		}
-		MethodSignature MethodSignature = (MethodSignature)jp.getSignature();
+		MethodSignature MethodSignature = (MethodSignature) jp.getSignature();
 		Method method = MethodSignature.getMethod();
 		QmUserManagerAPI qmUserManagerAPI = method.getAnnotation(QmUserManagerAPI.class);
-		if(qmUserManagerAPI == null) {
+		if (qmUserManagerAPI == null) {
 			return;
 		}
-		if(qmUserManagerAPI.logOpen()) {
+		if (qmUserManagerAPI.logOpen()) {
 			QmLogger qmLogger = new QmLogger();
 			qmLogger.setOperator(null);
 			qmLogger.setRequestClassName(jp.getTarget().getClass().getName());
@@ -357,7 +339,7 @@ public @Component("qmUserManager") class QmUserManager {
 			qmLogger.setRequestParam(Arrays.toString(jp.getArgs()));
 			qmLogger.setRequestURL(request.getRequestURL().toString());
 			qmLogger.setText(qmUserManagerAPI.log());
-			Object user = getUser();
+			Object user = getQmbject().getBean();
 			String userCode = ApiUtil.getFieldValueByFieldName(USERCODE_FIELD_NAME, user).toString();
 			qmLogger.setOperator(userCode);
 			qmLogger.setCreateTime(new Date());
@@ -365,5 +347,5 @@ public @Component("qmUserManager") class QmUserManager {
 			qmUserManagerService.addUserLogger(USER_LOGGER_TABLE_NAME, qmLogger);
 		}
 	}
-	
+
 }

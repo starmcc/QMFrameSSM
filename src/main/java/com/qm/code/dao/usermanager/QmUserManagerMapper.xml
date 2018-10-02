@@ -5,7 +5,10 @@
 <mapper namespace="com.qm.code.dao.usermanager.QmUserManagerMapper">
 	<!-- 获取角色 -->
  	<select id="getRole" resultType="QmRole">
-		SELECT * FROM ${tableName} WHERE roleId = #{roleId}
+		SELECT * FROM ${tableName} WHERE 1 = 1
+		<if test="role != null">
+			<if test="role.roleId != null">AND roleId = #{role.roleId}</if>
+		</if>
 	</select>
 	
 	<!-- 获取权限 -->
@@ -56,6 +59,11 @@
 		#{qmLogger.requestParam},
 		#{qmLogger.responseTime}
 		)
+	</select>
+	
+	<!-- 登录 -->
+	<select id="login" resultType="Map">
+		${sql}
 	</select>
 	
 </mapper>

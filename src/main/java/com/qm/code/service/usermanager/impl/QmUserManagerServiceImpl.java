@@ -1,6 +1,7 @@
 package com.qm.code.service.usermanager.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,8 +24,8 @@ public class QmUserManagerServiceImpl implements QmUserManagerService {
 	private QmUserManagerMapper qmUserManagerMapper;
 
 	@Override
-	public QmRole getRole(String tableName, Integer roleId) {
-		return qmUserManagerMapper.getRole(tableName, roleId);
+	public List<QmRole> getRole(String tableName, QmRole qmRole) {
+		return qmUserManagerMapper.getRole(tableName, qmRole);
 	}
 
 	@Override
@@ -33,23 +34,28 @@ public class QmUserManagerServiceImpl implements QmUserManagerService {
 	}
 
 	@Override
-	public Integer changeRole(String tableName, QmRole qmRole) {
+	public Integer changeTableRole(String tableName, QmRole qmRole) {
 		return qmUserManagerMapper.changeRole(tableName, qmRole);
 	}
 
 	@Override
-	public Integer addRole(String tableName, QmRole qmRole) {
+	public Integer addTableRole(String tableName, QmRole qmRole) {
 		return qmUserManagerMapper.addRole(tableName, qmRole);
 	}
 
 	@Override
-	public Integer delRole(String tableName, Integer roleId) {
+	public Integer delTableRole(String tableName, Integer roleId) {
 		return qmUserManagerMapper.delRole(tableName, roleId);
 	}
 
 	@Override
-	public Integer addUserLogger(String tableName,QmLogger qmLogger) {
-		return qmUserManagerMapper.addUserLogger(tableName,qmLogger);
+	public Integer addUserLogger(String tableName, QmLogger qmLogger) {
+		return qmUserManagerMapper.addUserLogger(tableName, qmLogger);
+	}
+
+	@Override
+	public Map<String, Object> login(String sql, String userName, String password) {
+		return qmUserManagerMapper.login(sql, userName, password);
 	}
 
 }

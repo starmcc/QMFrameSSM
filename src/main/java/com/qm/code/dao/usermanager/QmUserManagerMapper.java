@@ -1,6 +1,7 @@
 package com.qm.code.dao.usermanager;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -14,6 +15,17 @@ import com.qm.code.entity.usermanager.QmRole;
  * @Description 用户管理器数据层
  */
 public interface QmUserManagerMapper {
+
+	/**
+	 * 登录
+	 * 
+	 * @param sql
+	 * @param userName
+	 * @param password
+	 * @return
+	 */
+	Map<String,Object> login(@Param("sql") String sql, @Param("userName") String userName, @Param("password") String password);
+
 	/**
 	 * 获取角色
 	 * 
@@ -21,7 +33,7 @@ public interface QmUserManagerMapper {
 	 * @param roleId
 	 * @return
 	 */
-	QmRole getRole(@Param("tableName") String tableName, @Param("roleId") Integer roleId);
+	List<QmRole> getRole(@Param("tableName") String tableName, @Param("role") QmRole qmRole);
 
 	/**
 	 * 修改角色

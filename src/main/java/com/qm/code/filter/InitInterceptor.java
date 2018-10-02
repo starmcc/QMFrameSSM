@@ -31,7 +31,7 @@ public class InitInterceptor implements HandlerInterceptor{
 			return false;
 		}
 		//登录控制
-		is = qmUserManager.loginVerify(handler);
+		is = qmUserManager.loginFilterVerify(handler);
 		if(!is) {
 			sendFilterJSON(response,302,"请求失败,登录状态校验失败!","");
 			return false;

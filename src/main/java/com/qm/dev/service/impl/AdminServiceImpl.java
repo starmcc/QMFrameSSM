@@ -8,23 +8,23 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.qm.code.service.common.impl.QmServiceImpl;
-import com.qm.dev.dao.UserMapper;
-import com.qm.dev.entity.User;
-import com.qm.dev.service.UserService;
+import com.qm.dev.dao.AdminMapper;
+import com.qm.dev.entity.Admin;
+import com.qm.dev.service.AdminService;
 
 /**
  * @author 浅梦工作室
  * @createDate 2018年8月21日 上午1:32:07
  * @Description 拓展service 实现类 Demo
 */
-@Service("userService")
-public class UserServiceImpl extends QmServiceImpl<User> implements UserService{
+@Service
+public class AdminServiceImpl extends QmServiceImpl<Admin> implements AdminService{
 
 	@Resource
-	private UserMapper userMapper;
+	private AdminMapper adminMapper;
 	
 	@Override
-	public List<Map<String, Object>> getTestList(User user) {
-		return userMapper.getTestList(user);
+	public List<Map<String, Object>> getTestList(Admin admin) {
+		return adminMapper.getTestList(admin);
 	}
 }

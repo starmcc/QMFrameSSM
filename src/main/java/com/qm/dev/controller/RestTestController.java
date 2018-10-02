@@ -13,13 +13,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.qm.code.entity.usermanager.QmRole;
+import com.qm.code.entity.usermanager.Qmbject;
 import com.qm.code.note.QmUserManagerAPI;
 import com.qm.code.util.baidu.BaiduStatisticsUtil;
 import com.qm.code.util.frame.ApiUtil;
 import com.qm.code.util.frame.QmUserManager;
 import com.qm.code.util.logger.QmLog;
-import com.qm.dev.entity.User;
-import com.qm.dev.service.UserService;
+import com.qm.dev.entity.Admin;
+import com.qm.dev.service.AdminService;
 
 /**
  * @author 浅梦工作室
@@ -32,7 +34,7 @@ public class RestTestController{
 	
 	//注入通用service
 	@Resource
-	private UserService userService;
+	private AdminService adminService;
 	@Resource
 	private QmUserManager qmUserManager;
 	
@@ -57,22 +59,23 @@ public class RestTestController{
 	 * 登录Demo接口
 	 * @param session
 	 * @return
+	 * @throws Exception 
 	 */
 	@GetMapping("/demo2")
 	@QmUserManagerAPI(needLogin=false,logOpen=true,log="测试")
-	public String demo2(HttpServletRequest request) {
-		User user = new User();
-		user.setUserName("admin");
-		user.setPassword("admin");
-		user.setRoleId(1);
+	public String demo2(HttpServletRequest request) throws Exception {
 		//此为封装好的登录+监听工具类，直接调用即可登录
-		int res = qmUserManager.start(user,user.getRoleId());
-		if(res != 1) {
-			return ApiUtil.sendJSON(ApiUtil.CODE_DEFEATED, "未设置该用户的角色", res);
+		Qmbject qmbject = qmUserManager.login(new Admin(), "admin", "admin");
+		if(qmbject == null) {
+			return ApiUtil.sendJSON(ApiUtil.CODE_DEFEATED, "未设置该用户的角色", null);
 		}
+		Admin admin = (Admin) qmbject.getBean();
+		QmRole qmRole = new QmRole();
+		qmRole.setRoleId(admin.getRoleId());
+		qmbject.setQmRole(qmRole);
+		qmUserManager.setQmbject(qmbject);
 		//登录期间可直接调用get方法获取登录用户信息,如果没登录直接为空。
-		User user2 = (User) qmUserManager.getUser();
-		return ApiUtil.sendJSON(ApiUtil.CODE_DEFEATED, "登录成功", user2);
+		return ApiUtil.sendJSON(ApiUtil.CODE_DEFEATED, "登录成功", qmbject);
 	}
 
 	/**
@@ -92,7 +95,7 @@ public class RestTestController{
 	@GetMapping("/demo4")
 	public String demo4() {
 		PageHelper.startPage(1,10);
-		List<Map<String,Object>> map = userService.getTestList(null);
+		List<Map<String,Object>> map = adminService.getTestList(null);
 		PageInfo<Map<String,Object>> pageInfo = new PageInfo<Map<String,Object>>(map);
 		return ApiUtil.sendJSON(ApiUtil.CODE_SUCCESS, "查询成功", pageInfo);
 	}
@@ -107,7 +110,5 @@ public class RestTestController{
 		QmLog.debug(addr1 + "到" + addr2 + "的distance----->"+ distance + " KM");
 		return ApiUtil.sendJSON(ApiUtil.CODE_SUCCESS, "查询成功", distance);
 	}
-	
-
 	
 }
