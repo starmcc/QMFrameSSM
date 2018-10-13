@@ -28,6 +28,8 @@ public class InitInterceptor implements HandlerInterceptor{
 	
 	private static final String QMFRAME_FILTER_VIEWNAME = PropertiesUtil.get("qmframe.filter.viewName");
 	
+	private static final String QMFRAME_REQUEST_PATH_KEY = PropertiesUtil.get("qmframe.request.path.key");
+	
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException{
 		//项目根路径
@@ -62,7 +64,7 @@ public class InitInterceptor implements HandlerInterceptor{
 			basePathSb.append(request.getServerPort());
 			basePathSb.append(path);
 			basePathSb.append("/");
-			request.setAttribute("pathUrl", basePathSb.toString());
+			request.setAttribute(QMFRAME_REQUEST_PATH_KEY, basePathSb.toString());
 		}
 	}
 
