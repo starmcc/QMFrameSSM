@@ -29,7 +29,7 @@ import com.qm.code.util.io.PropertiesUtil;
 
 /**
  * @author 浅梦工作室
- * @createDate 2018年9月28日 下午11:59:23
+ * @createDate 2018年10月14日02:52:52
  * @Description QM用户管理器
  */
 public @Component class QmUserManager {

@@ -83,13 +83,18 @@ public class ApiUtil {
 	/**
 	 * 返回视图层的数据key名
 	 */
-	public static final String MVC_DATA_KEY = PropertiesUtil.get("mvc.data.key");
+	public static final String QMFRAME_SEND_DATA_KEY = PropertiesUtil.get("qmframe.send.data.key");
+	
+	/**
+	 * 返回视图层的数据key名
+	 */
+	public static final String QMFRAME_REQUEST_DATA_KEY = PropertiesUtil.get("qmframe.request.data.key");
 	
 	//返回code规范常量调用
 	
 	/**
 	 * 请求解析
-	 * 解析格式为{"value":{"param":"xxx","param2":"xxx"}}的JSON参数
+	 * 解析格式为{"配置的key名":{"param":"xxx","param2":"xxx"}}的JSON参数
 	 * @param value 前端传入的数据
 	 * @return
 	 */
@@ -102,7 +107,7 @@ public class ApiUtil {
 				str = DES3Util.decode(value);
 				map = JSON.parseObject(str);
 				//解析value对象
-				String strTemp = map.get("value").toString();
+				String strTemp = map.get(QMFRAME_REQUEST_DATA_KEY).toString();
 				map = JSON.parseObject(strTemp);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -111,7 +116,7 @@ public class ApiUtil {
     	}else {
     		//不解密
     		map = JSON.parseObject(value);
-    		String strTemp = map.get("value").toString();
+    		String strTemp = map.get(QMFRAME_REQUEST_DATA_KEY).toString();
 			map = JSON.parseObject(strTemp);
     	}
     	return map;
@@ -120,7 +125,7 @@ public class ApiUtil {
 	
 	/**
 	 * 请求解析(重载)
-	 * 解析格式为{"value":{"param":"xxx","param2":"xxx"}}的JSON参数
+	 * 解析格式为{"配置的key名":{"param":"xxx","param2":"xxx"}}的JSON参数
 	 * @param value 前端传入的数据
 	 * @param desType 是否解密
 	 * @return
@@ -135,7 +140,7 @@ public class ApiUtil {
 				str = DES3Util.decode(value);
 				map = JSON.parseObject(str);
 				//解析value对象
-				String strTemp = map.get("value").toString();
+				String strTemp = map.get(QMFRAME_REQUEST_DATA_KEY).toString();
 				map = JSON.parseObject(strTemp);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -144,7 +149,7 @@ public class ApiUtil {
     	}else {
     		//不解密
     		map = JSON.parseObject(value);
-    		String strTemp = map.get("value").toString();
+    		String strTemp = map.get(QMFRAME_REQUEST_DATA_KEY).toString();
 			map = JSON.parseObject(strTemp);
     	}
     	return map;
@@ -152,21 +157,21 @@ public class ApiUtil {
 	
 	/**
 	 * 接口回调方法
-	 * @param code 回调编码
-	 * @param
-	 * @param data 回调数据
+	 * @param code 编码
+	 * @param msg 提示信息
+	 * @param data 数据
 	 * @return
 	 */
 	public static String sendJSON(int code,String msg,Object data) {
 		//示例
 		//ResponseDataUtil.sendJSON(1,"信息", "obj数据");
+		QmResponse qmResponse = new QmResponse();
+		qmResponse.setCode(code);
+		qmResponse.setMsg(msg);
+		qmResponse.setData(data);
 		Map<String,Object> responseMap = new HashMap<String,Object>();
-		responseMap.put("code", code);
-		responseMap.put("msg", msg);
-		responseMap.put("data", data);
-		Map<String,Object> responseMap2 = new HashMap<String,Object>();
 		//SerializerFeature.WriteMapNullValue设置后,返回Bean时字段为空时默认返回null
-		String value = JSON.toJSONString(responseMap,SerializerFeature.WriteMapNullValue);
+		String value = JSON.toJSONString(qmResponse,SerializerFeature.WriteMapNullValue);
 		try {
 			if(PropertiesUtil.get("DES3.start").trim().equals("true")) {
 				value = DES3Util.encode(value);
@@ -175,8 +180,8 @@ public class ApiUtil {
 			e.printStackTrace();
 			QmLog.debug("加密失败");
 		}
-		responseMap2.put("value", value);
-		return JSON.toJSONString(responseMap2);
+		responseMap.put(QMFRAME_SEND_DATA_KEY, value);
+		return JSON.toJSONString(responseMap);
 	}
 	
 	
@@ -187,12 +192,12 @@ public class ApiUtil {
 	 * @param msg
 	 * @param data
 	 */
-	public static void sendValueMVC(Model model,int code,String msg,Object data) {
+	public static void sendRequestView(Model model,int code,String msg,Object data) {
 		QmResponse qmResponse = new QmResponse();
 		qmResponse.setCode(code);
 		qmResponse.setMsg(msg);
 		qmResponse.setData(data);
-		model.addAttribute(MVC_DATA_KEY, qmResponse);
+		model.addAttribute(QMFRAME_SEND_DATA_KEY, qmResponse);
 		return;
 	}
 	
@@ -203,12 +208,12 @@ public class ApiUtil {
 	 * @param msg
 	 * @param data
 	 */
-	public static void sendValueMVC(ModelAndView modelAndView,int code,String msg,Object data) {
+	public static void sendRequestView(ModelAndView modelAndView,int code,String msg,Object data) {
 		QmResponse qmResponse = new QmResponse();
 		qmResponse.setCode(code);
 		qmResponse.setMsg(msg);
 		qmResponse.setData(data);
-		modelAndView.addObject(MVC_DATA_KEY, qmResponse);
+		modelAndView.addObject(QMFRAME_SEND_DATA_KEY, qmResponse);
 		return;
 	}
 	
@@ -219,12 +224,12 @@ public class ApiUtil {
 	 * @param msg
 	 * @param data
 	 */
-	public static void sendValueMVC(HttpServletRequest request,int code,String msg,Object data) {
+	public static void sendRequestView(HttpServletRequest request,int code,String msg,Object data) {
 		QmResponse qmResponse = new QmResponse();
 		qmResponse.setCode(code);
 		qmResponse.setMsg(msg);
 		qmResponse.setData(data);
-		request.setAttribute(MVC_DATA_KEY, qmResponse);
+		request.setAttribute(QMFRAME_SEND_DATA_KEY, qmResponse);
 		return;
 	}
 	
@@ -487,13 +492,12 @@ public class ApiUtil {
 		System.out.println(is);
 	}
 	
-	  /**
-     * 根据属性名获取属性值
-     * 
-     * @param fieldName
-     * @param object
-     * @return
-     */
+	/**
+	 * 根据属性名获取属性值
+	 * @param fieldName
+	 * @param object
+	 * @return
+	 */
     public static Object getFieldValueByFieldName(String fieldName, Object object) {
         try {
         	System.out.println(object.getClass());
