@@ -21,7 +21,8 @@ import com.qm.code.util.frame.ApiUtil;
 import com.qm.code.util.frame.QmUserManager;
 import com.qm.code.util.logger.QmLog;
 import com.qm.dev.entity.Admin;
-import com.qm.dev.service.AdminService;
+import com.qm.dev.service.admin.AdminService;
+import com.qm.dev.service.testadmin.TestAdminService;
 
 /**
  * @author 浅梦工作室
@@ -37,6 +38,8 @@ public class RestTestController{
 	private AdminService adminService;
 	@Resource
 	private QmUserManager qmUserManager;
+	@Resource
+	private TestAdminService TestAdminService;
 	
 	/**
 	 * 接口demo
@@ -65,7 +68,7 @@ public class RestTestController{
 	@QmUserManagerAPI(needLogin=false,logOpen=true,log="测试")
 	public String demo2(HttpServletRequest request) throws Exception {
 		//此为封装好的登录+监听工具类，直接调用即可登录
-		Qmbject qmbject = qmUserManager.login(new Admin(), "admin", "admin");
+		Qmbject qmbject = qmUserManager.login(Admin.class, "admin", "admin");
 		if(qmbject == null) {
 			return ApiUtil.sendJSON(ApiUtil.CODE_DEFEATED, "未设置该用户的角色", null);
 		}
@@ -73,7 +76,7 @@ public class RestTestController{
 		QmRole qmRole = new QmRole();
 		qmRole.setRoleId(admin.getRoleId());
 		qmbject.setQmRole(qmRole);
-		qmUserManager.setQmbject(qmbject);
+		qmUserManager.updateQmbject(qmbject);
 		//登录期间可直接调用get方法获取登录用户信息,如果没登录直接为空。
 		return ApiUtil.sendJSON(ApiUtil.CODE_DEFEATED, "登录成功", qmbject);
 	}

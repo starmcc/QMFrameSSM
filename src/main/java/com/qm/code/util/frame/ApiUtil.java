@@ -1,17 +1,27 @@
 package com.qm.code.util.frame;
 
+import java.beans.BeanInfo;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.codec.binary.Hex;
+import org.springframework.ui.Model;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.qm.code.entity.api.QmResponse;
 import com.qm.code.util.des.DES3Util;
 import com.qm.code.util.io.PropertiesUtil;
 import com.qm.code.util.logger.QmLog;
@@ -69,6 +79,12 @@ public class ApiUtil {
 	 * 服务器错误
 	 */
 	public static final int CODE_SERVER_ERROR = 500;
+	
+	/**
+	 * 返回视图层的数据key名
+	 */
+	public static final String MVC_DATA_KEY = PropertiesUtil.get("mvc.data.key");
+	
 	//返回code规范常量调用
 	
 	/**
@@ -163,6 +179,54 @@ public class ApiUtil {
 		return JSON.toJSONString(responseMap2);
 	}
 	
+	
+	/**
+	 * 传递MVC的model值封装
+	 * @param model
+	 * @param code
+	 * @param msg
+	 * @param data
+	 */
+	public static void sendValueMVC(Model model,int code,String msg,Object data) {
+		QmResponse qmResponse = new QmResponse();
+		qmResponse.setCode(code);
+		qmResponse.setMsg(msg);
+		qmResponse.setData(data);
+		model.addAttribute(MVC_DATA_KEY, qmResponse);
+		return;
+	}
+	
+	/**
+	 * 传递MVC的model值封装
+	 * @param modelAndView
+	 * @param code
+	 * @param msg
+	 * @param data
+	 */
+	public static void sendValueMVC(ModelAndView modelAndView,int code,String msg,Object data) {
+		QmResponse qmResponse = new QmResponse();
+		qmResponse.setCode(code);
+		qmResponse.setMsg(msg);
+		qmResponse.setData(data);
+		modelAndView.addObject(MVC_DATA_KEY, qmResponse);
+		return;
+	}
+	
+	/**
+	 * 传递MVC的model值封装
+	 * @param request
+	 * @param code
+	 * @param msg
+	 * @param data
+	 */
+	public static void sendValueMVC(HttpServletRequest request,int code,String msg,Object data) {
+		QmResponse qmResponse = new QmResponse();
+		qmResponse.setCode(code);
+		qmResponse.setMsg(msg);
+		qmResponse.setData(data);
+		request.setAttribute(MVC_DATA_KEY, qmResponse);
+		return;
+	}
 	
 	/**
 	 * 判断对象中字段值是否存在null，如果有null返回false,调用此类中的errorMsg可以查看哪个字段为null。
@@ -432,6 +496,7 @@ public class ApiUtil {
      */
     public static Object getFieldValueByFieldName(String fieldName, Object object) {
         try {
+        	System.out.println(object.getClass());
             Field field = object.getClass().getDeclaredField(fieldName);
             //设置对象的访问权限，保证对private的属性的访问
             field.setAccessible(true);
@@ -441,4 +506,34 @@ public class ApiUtil {
         } 
     }
 
+    
+    /**
+     * 将map转为bean
+     * @param map
+     * @param clamm
+     * @return
+     * @throws Exception
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException
+     */
+	public static <T, K, V> T mapToBean(Map<K, V> map, Class<T> clamm)
+            throws Exception {
+        T t = null;
+        try {
+            BeanInfo beanInfo = Introspector.getBeanInfo(clamm);
+            PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
+            t = clamm.newInstance();
+            for (PropertyDescriptor property : propertyDescriptors) {
+                String key = property.getName();
+                if (map.containsKey(key)) {
+                    Object value = map.get(key);
+                    Method setter = property.getWriteMethod();// Java中提供了用来访问某个属性的
+                    setter.invoke(t, value);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return t;
+    }
 }

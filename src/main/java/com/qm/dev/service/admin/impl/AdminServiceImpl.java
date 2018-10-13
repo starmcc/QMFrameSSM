@@ -1,4 +1,4 @@
-package com.qm.dev.service.impl;
+package com.qm.dev.service.admin.impl;
 
 import java.util.List;
 import java.util.Map;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import com.qm.code.service.common.impl.QmServiceImpl;
 import com.qm.dev.dao.AdminMapper;
 import com.qm.dev.entity.Admin;
-import com.qm.dev.service.AdminService;
+import com.qm.dev.service.admin.AdminService;
 
 /**
  * @author 浅梦工作室

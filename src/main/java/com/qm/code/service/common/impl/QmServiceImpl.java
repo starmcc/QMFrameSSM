@@ -3,6 +3,7 @@ package com.qm.code.service.common.impl;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import com.qm.code.service.common.QmService;
 
 import tk.mybatis.mapper.common.Mapper;

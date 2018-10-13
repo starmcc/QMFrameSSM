@@ -13,7 +13,6 @@ import javax.servlet.http.HttpSession;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.cglib.beans.BeanMap;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -99,7 +98,7 @@ public @Component class QmUserManager {
 	 * @return
 	 * @throws Exception
 	 */
-	public Qmbject login(Object bean, String userName, String password) throws Exception {
+	public <T> Qmbject login(Class<T> clamm, String userName, String password) throws Exception {
 		if (LOGIN_SQL == null) {
 			return null;
 		}
@@ -109,26 +108,28 @@ public @Component class QmUserManager {
 		if (onLine == null) {
 			onLine = new QmLoginOnLine();
 		}
-		Map<String, Object> map = qmUserManagerService.login(LOGIN_SQL, userName, password);
-		BeanMap beanMap = BeanMap.create(bean);
-		beanMap.putAll(map);
-		if (bean == null) {
+		Map<String,Object> map = qmUserManagerService.login(LOGIN_SQL, userName, password);
+		if(map == null) {
+			return null;
+		}
+		T tBean = ApiUtil.mapToBean(map,clamm);
+		if (tBean == null) {
 			return null;
 		}
 		Qmbject qmbject = new Qmbject();
-		qmbject.setBean(bean);
+		qmbject.setBean(tBean);
 		onLine.setQmbject(qmbject);
 		session.setAttribute(SESSION_KEY, onLine);
 		return qmbject;
 	}
-
+	
 	/**
 	 * 更新用户对象
 	 * 
 	 * @param qmbject
 	 * @return 如果找不到该角色返回-1,成功返回1,表字段错误返回0,-2
 	 */
-	public int setQmbject(Qmbject qmbject) {
+	public int updateQmbject(Qmbject qmbject) {
 		request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 		HttpSession session = request.getSession();
 		onLine = (QmLoginOnLine) session.getAttribute(SESSION_KEY);
