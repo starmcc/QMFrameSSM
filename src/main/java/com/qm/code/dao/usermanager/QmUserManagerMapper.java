@@ -62,7 +62,7 @@ public interface QmUserManagerMapper {
 	Integer addRole(@Param("tableName") String tableName, @Param("role") QmRole qmRole);
 
 	/**
-	 * 添加角色
+	 * 删除角色
 	 * 
 	 * @param tableName
 	 * @param roleId

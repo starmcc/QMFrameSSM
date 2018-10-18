@@ -78,8 +78,8 @@
 
 	<!-- Spring注解扫描支持 -->
 	<!-- Mybatis的XML扫描器 -->
-	<!-- <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer"> <property 
-		name="basePackage" value="com.qm.dev.dao" /> </bean> -->
+	<!-- <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer"> 
+	<property name="basePackage" value="com.qm.dev.dao" /> </bean> -->
 	<bean class="tk.mybatis.spring.mapper.MapperScannerConfigurer">
 		<!-- 指定接口扫描位置 -->
 		<property name="basePackage" value="com.qm.**.dao" />

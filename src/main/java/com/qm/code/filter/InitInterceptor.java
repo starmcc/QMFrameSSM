@@ -32,6 +32,9 @@ public class InitInterceptor implements HandlerInterceptor{
 	
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException{
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		response.setContentType("text/html;charset=utf-8");
 		//项目根路径
 		setPath(request);
 		//版本控制
@@ -82,8 +85,6 @@ public class InitInterceptor implements HandlerInterceptor{
 				ApiUtil.sendRequestView(request, code, msg, data);
 				request.getRequestDispatcher(QMFRAME_FILTER_VIEWNAME).forward(request,response);
 			}else {
-				response.setCharacterEncoding("utf-8");
-				response.setContentType("text/html;charset=utf-8");
 				response.getWriter().write(ApiUtil.sendJSON(code, msg, data));
 			}
 		} catch (ServletException e) {

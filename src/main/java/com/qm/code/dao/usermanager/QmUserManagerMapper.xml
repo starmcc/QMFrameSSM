@@ -4,51 +4,52 @@
  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.qm.code.dao.usermanager.QmUserManagerMapper">
 	<!-- 获取角色 -->
- 	<select id="getRole" resultType="QmRole">
+	<select id="getRole" resultType="QmRole">
 		SELECT * FROM ${tableName} WHERE 1 = 1
 		<if test="role != null">
 			<if test="role.roleId != null">AND roleId = #{role.roleId}</if>
 		</if>
 	</select>
-	
+
 	<!-- 获取权限 -->
 	<select id="getPower" resultType="QmPower">
-		SELECT * FROM ${tableName} where 1 = 1
-	</select> 
-	
+		SELECT * FROM ${tableName}
+		where 1 = 1
+	</select>
+
 	<!-- 修改角色 -->
 	<update id="changeRole">
 		UPDATE ${tableName} SET `roleId` = #{role.roleId}
 		<if test="role != null">
-			<if test="role.roleName != null">`roleName` = #{role.roleName}</if>
-			<if test="role.createTime != null">`createTime` = #{role.createTime}</if>
-			<if test="role.createOperator != null">`createOperator` = #{role.createOperator}</if>
-			<if test="role.updateTime != null">`updateTime` = #{role.updateTime}</if>
-			<if test="role.updateOperator != null">`updateOperator` = #{role.updateOperator}</if>
-			<if test="role.powerIds != null">`powerIds` = #{role.powerIds}</if>
+			<if test="role.roleName != null">,`roleName` = #{role.roleName}</if>
+			<if test="role.updateTime != null">,`updateTime` = #{role.updateTime}</if>
+			<if test="role.updateOperator != null">,`updateOperator` = #{role.updateOperator}</if>
+			<if test="role.powerIds != null">,`powerIds` = #{role.powerIds}</if>
 		</if>
 		WHERE `roleId` = #{role.roleId}
 	</update>
-	
+
 	<!-- 添加角色 -->
 	<insert id="addRole">
-		INSERT INTO ${tableName} (roleName,createTime,createOperator,updateTime,updateOperator,powerIds)
-		VALUES (#{qmRole.roleName},
-		#{qmRole.createTime},
-		#{qmRole.createOperator},
-		#{qmRole.updateTime},
-		#{qmRole.updateOperator},
-		#{qmRole.powerIds})
+		INSERT INTO ${tableName}
+		(roleName,createTime,createOperator,updateTime,updateOperator,powerIds)
+		VALUES (#{role.roleName},
+		#{role.createTime},
+		#{role.createOperator},
+		#{role.updateTime},
+		#{role.updateOperator},
+		#{role.powerIds})
 	</insert>
-	
+
 	<!-- 删除角色 -->
 	<delete id="delRole">
 		DELETE FROM ${tableName} WHERE roleId = #{roleId}
 	</delete>
-	
+
 	<!-- 添加日志 -->
 	<select id="addUserLogger">
-		INSERT INTO ${tableName} (operator,createTime,text,requestURL,requestClassName,requestMethod,requestParam,responseTime)
+		INSERT INTO ${tableName}
+		(operator,createTime,text,requestURL,requestClassName,requestMethod,requestParam,responseTime)
 		VALUES (
 		#{qmLogger.operator},
 		#{qmLogger.createTime},
@@ -60,10 +61,10 @@
 		#{qmLogger.responseTime}
 		)
 	</select>
-	
+
 	<!-- 登录 -->
 	<select id="login" resultType="Map">
 		${sql}
 	</select>
-	
+
 </mapper>

@@ -1,11 +1,11 @@
 package com.qm.code.entity.usermanager;
 
-import java.sql.Date;
+import java.util.Date;
 
 /**
  * @author 浅梦工作室
  * @createDate 2018年9月29日 上午1:37:31
- * @Description 角色实体
+ * @Description 角色实体类
  */
 public class QmRole {
 	/**
