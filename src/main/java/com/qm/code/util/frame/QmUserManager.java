@@ -1,7 +1,6 @@
 package com.qm.code.util.frame;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -161,6 +160,8 @@ public @Component class QmUserManager {
 					e.printStackTrace();
 					return 0;
 				}
+			}else {
+				qmbject.setQmRole(onLine.getQmbject().getQmRole());
 			}
 			onLine.setQmbject(qmbject);
 			session.setAttribute(SESSION_KEY, onLine);
@@ -247,7 +248,7 @@ public @Component class QmUserManager {
 	 * 获取权限表
 	 * @return
 	 */
-	public List<QmPower> getPower() {
+	public List<QmPower> getAllPowers() {
 		request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 		ServletContext application = request.getServletContext();
 		@SuppressWarnings("unchecked")
@@ -275,40 +276,35 @@ public @Component class QmUserManager {
 	}
 	
 	/**
-	 * 为角色添加权限
+	 * 设置角色权限
 	 * @Param qmRole
 	 * @param powerIds
 	 * @return
 	 */
-	public boolean addRolePower(QmRole qmRole,Integer[] powerIds) {
+	public boolean settingRolePower(QmRole qmRole,Integer[] powerIds) {
 		List<QmRole> qmRoles = qmUserManagerService.getTableRole(ROLE_TABLE_NAME, qmRole);
 		if (qmRoles == null || qmRoles.size() == 0) {
 			return false;
 		}
-		Integer[] rolePowerIds = qmRoles.get(0).getPowerIds();
-		List<Integer> list = new ArrayList<Integer>(Arrays.asList(rolePowerIds));
-        list.addAll(Arrays.asList(powerIds));
-        List<Integer> listTemp = new ArrayList<Integer>();  
-        for(int i=0;i<list.size();i++){  
-            if(!listTemp.contains(list.get(i))){  
-                listTemp.add(list.get(i));  
-            }  
-        }
-        StringBuffer ids = new StringBuffer();
-        for (int i = 0; i < listTemp.size(); i++) {
-        	if(listTemp.get(i) == -1) {
-        		ids = new StringBuffer("-1");
-        		break;
-        	}
-        	ids.append(listTemp.get(i).toString());
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < powerIds.length; i++) {
+			sb.append(String.valueOf(powerIds[i]));
+			if (powerIds[i] == -1) {
+				sb = new StringBuffer(String.valueOf(powerIds[i]));
+				break;
+			}
+			if (i + 1 < powerIds.length) {
+				sb.append(",");
+			}
 		}
-        qmRole.setPowerIds(ids.toString());
+		qmRole.setPowerIds(sb.toString());
         int res = qmUserManagerService.changeTableRole(ROLE_TABLE_NAME, qmRole);
         if (res < 1) {
 			return false;
 		}
         return true;
 	}
+
 	
 	/**
 	 * Filter登录控制,权限控制
@@ -344,7 +340,7 @@ public @Component class QmUserManager {
 	 * 获取当前正在登录的用户集合(可获取在线列表数,在线列表等)
 	 * @return
 	 */
-	public List<Object> getApplicationQmUser() {
+	public List<Object> getApplicationLoginList() {
 		request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 		ServletContext application = request.getServletContext();
 		@SuppressWarnings("unchecked")
@@ -392,7 +388,7 @@ public @Component class QmUserManager {
 	 * @param qmLogger
 	 * @return
 	 */
-	public boolean addUserLogger(QmLogger qmLogger) {
+	public boolean addManagerLogger(QmLogger qmLogger) {
 		int res = qmUserManagerService.addUserLogger(USER_LOGGER_TABLE_NAME, qmLogger);
 		if (res < 1) {
 			return false;
@@ -405,7 +401,7 @@ public @Component class QmUserManager {
 	 * @param qmLogger
 	 * @return
 	 */
-	public boolean delUserLogger(Integer[] logIds) {
+	public boolean delManagerLogger(Integer[] logIds) {
 		int res = qmUserManagerService.delUserLogger(USER_LOGGER_TABLE_NAME,logIds);
 		if (res < 1) {
 			return false;
@@ -422,7 +418,7 @@ public @Component class QmUserManager {
 	 * 时间搜索时,会检索出设置时间之后的所有日志
 	 * @return
 	 */
-	public List<QmLogger> getUserLogger(QmLogger qmLogger) {
+	public List<QmLogger> getManagerLogger(QmLogger qmLogger) {
 		return qmUserManagerService.getUserLogger(USER_LOGGER_TABLE_NAME,qmLogger);
 	}
 	
@@ -433,7 +429,7 @@ public @Component class QmUserManager {
 	 * @param powerIdTemp
 	 * @return
 	 */
-	public boolean valueOfPower(Integer[] powerIds,Integer powerIdTemp) {
+	private boolean valueOfPower(Integer[] powerIds,Integer powerIdTemp) {
 		if(powerIds == null || powerIds.length == 0) {
 			// 无权限哦
 			return false;
