@@ -5,7 +5,9 @@ import java.util.Arrays;
 import javax.annotation.Resource;
 
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
@@ -29,11 +31,29 @@ public @Component class LoggerWhole {
 	@Resource
 	private QmUserManager qmUserManager;
 
-	// 切入点范围 所有controller
+	/**
+	 * 切入点范围 所有controller
+	 */
 	@Pointcut("execution(* com.qm..*.controller..*.*(..))")
 	public void qmPointcut() {
 	}
 
+	/**
+	 * 环绕增强(最强版)
+	 * @param pjp
+	 * @return
+	 * @throws Throwable
+	 */
+	@Around("qmPointcut()")
+	public Object around(ProceedingJoinPoint pjp) throws Throwable {
+		System.out.println("★★★★★★★★★★★★★★★★★★★★★★★★★★");
+		return pjp.proceed();
+	}
+	
+	/**
+	 * 前置增强
+	 * @param jp
+	 */
 	@Before("qmPointcut()")
 	public void before(JoinPoint jp) {
 		starTime = System.currentTimeMillis();
@@ -48,6 +68,11 @@ public @Component class LoggerWhole {
 		QmLog.debug(logStr.toString());
 	}
 
+	/**
+	 * 后置增强
+	 * @param jp
+	 * @param result 返回结果
+	 */
 	@AfterReturning(pointcut = "qmPointcut()", returning = "result")
 	public void afterReturning(JoinPoint jp, Object result) {
 		QmLog.debug("\n返回结果:【" + result + "】\n");

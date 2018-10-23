@@ -3,31 +3,11 @@
  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.qm.code.dao.usermanager.QmUserManagerMapper">
-	<!-- 获取角色 -->
-	<select id="getRole" resultType="QmRole">
-		SELECT * FROM ${tableName} WHERE 1 = 1
-		<if test="role != null">
-			<if test="role.roleId != null">AND roleId = #{role.roleId}</if>
-		</if>
-	</select>
 
-	<!-- 获取权限 -->
-	<select id="getPower" resultType="QmPower">
-		SELECT * FROM ${tableName}
-		where 1 = 1
+	<!-- 登录 -->
+	<select id="login" resultType="Map">
+		${sql}
 	</select>
-
-	<!-- 修改角色 -->
-	<update id="changeRole">
-		UPDATE ${tableName} SET `roleId` = #{role.roleId}
-		<if test="role != null">
-			<if test="role.roleName != null">,`roleName` = #{role.roleName}</if>
-			<if test="role.updateTime != null">,`updateTime` = #{role.updateTime}</if>
-			<if test="role.updateOperator != null">,`updateOperator` = #{role.updateOperator}</if>
-			<if test="role.powerIds != null">,`powerIds` = #{role.powerIds}</if>
-		</if>
-		WHERE `roleId` = #{role.roleId}
-	</update>
 
 	<!-- 添加角色 -->
 	<insert id="addRole">
@@ -46,11 +26,62 @@
 		DELETE FROM ${tableName} WHERE roleId = #{roleId}
 	</delete>
 
+	<!-- 修改角色 -->
+	<update id="changeRole">
+		UPDATE ${tableName} SET `roleId` = #{role.roleId}
+		<if test="role != null">
+			<if test="role.roleName != null">,`roleName` = #{role.roleName}</if>
+			<if test="role.createTime != null">, `createTime` = #{role.createTime}</if>
+			<if test="role.createOperator != null">, `createOperator` = #{role.createOperator}</if>
+			<if test="role.updateTime != null">,`updateTime` = #{role.updateTime}</if>
+			<if test="role.updateOperator != null">,`updateOperator` = #{role.updateOperator}</if>
+			<if test="role.powerIds != null">,`powerIds` = #{role.powerIds}</if>
+		</if>
+		WHERE `roleId` = #{role.roleId}
+	</update>
+
+	<!-- 获取角色 -->
+	<select id="getRole" resultType="QmRole">
+		SELECT * FROM ${tableName} WHERE 1 = 1
+		<if test="role != null">
+			<if test="role.roleId != null">AND roleId = #{role.roleId}</if>
+		</if>
+	</select>
+
+	<!-- 获取权限 -->
+	<select id="getPower" resultType="QmPower">
+		SELECT * FROM ${tableName}
+		WHERE 1 = 1
+		<if test="power != null">
+			<if test="power.powerId != null">AND `powerId` = #{power.powerId}</if>
+			<!-- 模糊搜索 -->
+			<if test="power.powerDescription != null">AND `powerDescription` LIKE CONCAT("%",#{power.powerDescription},"%")</if>
+		</if>
+	</select>
+
+	<!-- 根据powerIds获取权限列表 -->
+	<select id="getPowersById" resultType="QmPower">
+		<if test="powerIds != null">
+			SELECT * FROM ${tableName} WHERE `powerId` IN (
+				<foreach collection="powerIds" item="item" separator=",">
+					#{item}
+				</foreach>
+			)
+		</if>
+	</select>
+
 	<!-- 添加日志 -->
-	<select id="addUserLogger">
-		INSERT INTO ${tableName}
-		(operator,createTime,text,requestURL,requestClassName,requestMethod,requestParam,responseTime)
-		VALUES (
+	<insert id="addUserLogger">
+		INSERT INTO ${tableName} (
+		operator,
+		createTime,
+		text,
+		requestURL,
+		requestClassName,
+		requestMethod,
+		requestParam,
+		responseTime
+		) VALUES (
 		#{qmLogger.operator},
 		#{qmLogger.createTime},
 		#{qmLogger.text},
@@ -60,11 +91,35 @@
 		#{qmLogger.requestParam},
 		#{qmLogger.responseTime}
 		)
+	</insert>
+
+	<!-- 删除日志 -->
+	<delete id="delUserLogger">
+		<if test="logIds != null and logIds.length != 0">
+			DELETE FROM ${tableName} WHERE `logId` IN (
+			<foreach item="item" collection="logIds" separator=",">
+				#{item}
+			</foreach>
+			)
+		</if>
+	</delete>
+
+
+	<!-- 获取日志信息列表 -->
+	<select id="getUserLogger" resultType="QmLogger">
+		SELECT * FROM ${tableName} WHERE 1 = 1
+		<if test="log != null">
+			<if test="log.logId != null">AND `logId` = #{log.logId}</if>
+			<if test="log.operator != null">AND `operator`  LIKE CONCAT("%",#{log.operator},"%")</if>
+			<if test="log.text != null">AND `text` LIKE CONCAT("%",#{log.text},"%")</if>
+			<if test="log.requestURL != null">AND `requestURL` LIKE CONCAT("%",#{log.requestURL},"%")</if>
+			<if test="log.requestClassName != null">AND `requestClassName` LIKE CONCAT("%",#{log.requestClassName},"%")</if>
+			<if test="log.requestMethod != null">AND `requestMethod` LIKE CONCAT("%",#{log.requestMethod},"%")</if>
+			<if test="log.requestParam != null">AND `requestParam` LIKE CONCAT("%",#{log.requestParam},"%")</if>
+			<if test="log.createTime != null">AND `createTime` >= #{log.createTime}</if>
+			<if test="log.responseTime != null">AND `responseTime` >= #{log.responseTime}</if>
+		</if>
 	</select>
 
-	<!-- 登录 -->
-	<select id="login" resultType="Map">
-		${sql}
-	</select>
 
 </mapper>

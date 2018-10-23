@@ -1,6 +1,7 @@
 package com.qm.code.util.frame;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -29,7 +30,7 @@ import com.qm.code.util.io.PropertiesUtil;
 
 /**
  * @author 浅梦工作室
- * @createDate 2018年10月14日02:52:52
+ * @createDate 2018年9月28日 下午11:59:23
  * @Description QM用户管理器
  */
 public @Component class QmUserManager {
@@ -74,83 +75,100 @@ public @Component class QmUserManager {
 	 */
 	public static final String MANAGER_USER_LOGGER = PropertiesUtil.get("QmUserManager.user.logger");
 
-	public static String LOGIN_SQL = PropertiesUtil.get("QmUserManager.login.sql");
+	/**
+	 * 登录配置sql方案
+	 */
+	public String LOGIN_SQL = PropertiesUtil.get("QmUserManager.login.sql");
 	/**
 	 * 监听器
 	 */
 	private QmLoginOnLine onLine;
 	
+	/**
+	 * request作用域
+	 */
 	private HttpServletRequest request;
 
 	public QmUserManager() {
 
 	}
 
+	/**
+	 * 服务所需调用service
+	 */
 	@Resource
 	private QmUserManagerService qmUserManagerService;
 	
 	/**
 	 * 登录
-	 * 
 	 * @param bean
 	 * @param userName
 	 * @param password
 	 * @return
 	 * @throws Exception
 	 */
-	public <T> Qmbject login(Class<T> clamm, String userName, String password) throws Exception {
-		if (LOGIN_SQL == null) {
+	public <T> Qmbject login(Class<T> clamm, String userName, String password){
+		try {
+			if (LOGIN_SQL == null) {
+				return null;
+			}
+			request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+			HttpSession session = request.getSession();
+			onLine = (QmLoginOnLine) session.getAttribute(SESSION_KEY);
+			if (onLine == null) {
+				onLine = new QmLoginOnLine();
+			}
+			Map<String,Object> map = qmUserManagerService.login(LOGIN_SQL, userName, password);
+			if(map == null) {
+				return null;
+			}
+			T tBean = ApiUtil.mapToBean(map,clamm);
+			if (tBean == null) {
+				return null;
+			}
+			Qmbject qmbject = new Qmbject();
+			qmbject.setBean(tBean);
+			onLine.setQmbject(qmbject);
+			session.setAttribute(SESSION_KEY, onLine);
+			return qmbject;
+		} catch (Exception e) {
+			e.printStackTrace();
 			return null;
 		}
-		request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-		HttpSession session = request.getSession();
-		onLine = (QmLoginOnLine) session.getAttribute(SESSION_KEY);
-		if (onLine == null) {
-			onLine = new QmLoginOnLine();
-		}
-		Map<String,Object> map = qmUserManagerService.login(LOGIN_SQL, userName, password);
-		if(map == null) {
-			return null;
-		}
-		T tBean = ApiUtil.mapToBean(map,clamm);
-		if (tBean == null) {
-			return null;
-		}
-		Qmbject qmbject = new Qmbject();
-		qmbject.setBean(tBean);
-		onLine.setQmbject(qmbject);
-		session.setAttribute(SESSION_KEY, onLine);
-		return qmbject;
 	}
 	
 	/**
 	 * 更新用户对象
-	 * 
 	 * @param qmbject
-	 * @return 如果找不到该角色返回-1,成功返回1,表字段错误返回0,-2
+	 * @return 如果找不到该角色返回-1,成功返回1,表字段错误返回0,-2,异常-3
 	 */
 	public int updateQmbject(Qmbject qmbject) {
-		request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-		HttpSession session = request.getSession();
-		onLine = (QmLoginOnLine) session.getAttribute(SESSION_KEY);
-		if (onLine == null) {
-			return -2;
-		}
-		if (qmbject.getQmRole() != null) {
-			try {
-				List<QmRole> qmRoleLis = qmUserManagerService.getRole(ROLE_TABLE_NAME, qmbject.getQmRole());
-				if (qmRoleLis == null || qmRoleLis.size() == 0) {
-					return -1;
-				}
-				qmbject.setQmRole(qmRoleLis.get(0));
-			} catch (Exception e) {
-				e.printStackTrace();
-				return 0;
+		try {
+			request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+			HttpSession session = request.getSession();
+			onLine = (QmLoginOnLine) session.getAttribute(SESSION_KEY);
+			if (onLine == null) {
+				return -2;
 			}
+			if (qmbject.getQmRole() != null) {
+				try {
+					List<QmRole> qmRoleLis = qmUserManagerService.getTableRole(ROLE_TABLE_NAME, qmbject.getQmRole());
+					if (qmRoleLis == null || qmRoleLis.size() == 0) {
+						return -1;
+					}
+					qmbject.setQmRole(qmRoleLis.get(0));
+				} catch (Exception e) {
+					e.printStackTrace();
+					return 0;
+				}
+			}
+			onLine.setQmbject(qmbject);
+			session.setAttribute(SESSION_KEY, onLine);
+			return 1;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -3;
 		}
-		onLine.setQmbject(qmbject);
-		session.setAttribute(SESSION_KEY, onLine);
-		return 1;
 	}
 
 	/**
@@ -163,8 +181,7 @@ public @Component class QmUserManager {
 	}
 
 	/**
-	 * 获取用户对象
-	 * 
+	 * 获取登录对象
 	 * @return
 	 */
 	public Qmbject getQmbject() {
@@ -177,22 +194,7 @@ public @Component class QmUserManager {
 	}
 
 	/**
-	 * 修改表中角色
-	 * 
-	 * @param qmRole
-	 * @return
-	 */
-	public boolean changeTableRole(QmRole qmRole) {
-		int res = qmUserManagerService.changeTableRole(ROLE_TABLE_NAME, qmRole);
-		if (res < 1) {
-			return false;
-		}
-		return true;
-	}
-
-	/**
 	 * 添加表中角色
-	 * 
 	 * @param qmRole
 	 * @return
 	 */
@@ -205,8 +207,21 @@ public @Component class QmUserManager {
 	}
 
 	/**
+	 * 修改表中角色
+	 * @param qmRole
+	 * @return
+	 */
+	public boolean changeTableRole(QmRole qmRole) {
+		int res = qmUserManagerService.changeTableRole(ROLE_TABLE_NAME, qmRole);
+		if (res < 1) {
+			return false;
+		}
+		return true;
+	}
+
+
+	/**
 	 * 删除表中角色
-	 * 
 	 * @param qmRole
 	 * @return
 	 */
@@ -220,17 +235,16 @@ public @Component class QmUserManager {
 
 	/**
 	 * 获取表中角色
-	 * 
 	 * @param qmRole
 	 * @return
 	 */
 	public List<QmRole> getTableRoleList(QmRole qmRole) {
-		return qmUserManagerService.getRole(ROLE_TABLE_NAME, qmRole);
+		return qmUserManagerService.getTableRole(ROLE_TABLE_NAME, qmRole);
 	}
 
+	
 	/**
 	 * 获取权限表
-	 * 
 	 * @return
 	 */
 	public List<QmPower> getPower() {
@@ -239,15 +253,65 @@ public @Component class QmUserManager {
 		@SuppressWarnings("unchecked")
 		List<QmPower> qmUserManagerPowerList = (List<QmPower>) application.getAttribute(APPLICATION_POWER_KEY);
 		if (qmUserManagerPowerList == null || qmUserManagerPowerList.size() == 0) {
-			qmUserManagerPowerList = qmUserManagerService.getPower(POWER_TABLE_NAME);
+			qmUserManagerPowerList = qmUserManagerService.getTablePower(POWER_TABLE_NAME,null);
 			application.setAttribute(APPLICATION_POWER_KEY, qmUserManagerPowerList);
 		}
 		return qmUserManagerPowerList;
 	}
-
+	
+	/**
+	 * 根据角色获取权限列表
+	 * @param qmRole
+	 * @return
+	 */
+	public List<QmPower> getRolePower(QmRole qmRole){
+		List<QmRole> qmRoles = qmUserManagerService.getTableRole(ROLE_TABLE_NAME, qmRole);
+		if(qmRoles == null || qmRoles.size() == 0) {
+			return null;
+		}
+		qmRole = qmRoles.get(0);
+		Integer[] powers = qmRole.getPowerIds();
+		return qmUserManagerService.getPowersById(POWER_TABLE_NAME,powers);
+	}
+	
+	/**
+	 * 为角色添加权限
+	 * @Param qmRole
+	 * @param powerIds
+	 * @return
+	 */
+	public boolean addRolePower(QmRole qmRole,Integer[] powerIds) {
+		List<QmRole> qmRoles = qmUserManagerService.getTableRole(ROLE_TABLE_NAME, qmRole);
+		if (qmRoles == null || qmRoles.size() == 0) {
+			return false;
+		}
+		Integer[] rolePowerIds = qmRoles.get(0).getPowerIds();
+		List<Integer> list = new ArrayList<Integer>(Arrays.asList(rolePowerIds));
+        list.addAll(Arrays.asList(powerIds));
+        List<Integer> listTemp = new ArrayList<Integer>();  
+        for(int i=0;i<list.size();i++){  
+            if(!listTemp.contains(list.get(i))){  
+                listTemp.add(list.get(i));  
+            }  
+        }
+        StringBuffer ids = new StringBuffer();
+        for (int i = 0; i < listTemp.size(); i++) {
+        	if(listTemp.get(i) == -1) {
+        		ids = new StringBuffer("-1");
+        		break;
+        	}
+        	ids.append(listTemp.get(i).toString());
+		}
+        qmRole.setPowerIds(ids.toString());
+        int res = qmUserManagerService.changeTableRole(ROLE_TABLE_NAME, qmRole);
+        if (res < 1) {
+			return false;
+		}
+        return true;
+	}
+	
 	/**
 	 * Filter登录控制,权限控制
-	 * 
 	 * @param handler
 	 * @return
 	 */
@@ -267,34 +331,8 @@ public @Component class QmUserManager {
 					}
 					// 进入权限控制
 					if (MANAGER_POWER_OPEN.trim().equals("true")) {
-						if (qmUserManagerAPI.licence() != -1) {
-							if (qmbject.getQmRole() == null) {
-								return false;
-							}
-							QmRole qmRole = qmbject.getQmRole();
-							// 超级管理员是*
-							if (!qmRole.getPowerIds().trim().equals("*")) {
-								String[] userPowers = qmRole.getPowerIds().split(",");
-								if (userPowers == null || userPowers.length == 0) {
-									// 无权限哦
-									return false;
-								}
-								// 转int数组
-								int[] ids = new int[userPowers.length];
-								for (int i = 0; i < userPowers.length; i++) {
-									ids[i] = Integer.parseInt(userPowers[i]);
-								}
-								// 取出用户角色中的权限数组，并对比是否存在licence的权限
-								for (int i = 0; i < ids.length; i++) {
-									if (qmUserManagerAPI.licence() == ids[i]) {
-										break;
-									}
-									if (i + 1 >= ids.length) {
-										return false;
-									}
-								}
-							}
-						}
+						QmRole qmRole = qmbject.getQmRole();
+						return valueOfPower(qmRole.getPowerIds(), qmUserManagerAPI.licence());
 					}
 				}
 			}
@@ -304,7 +342,6 @@ public @Component class QmUserManager {
 
 	/**
 	 * 获取当前正在登录的用户集合(可获取在线列表数,在线列表等)
-	 * 
 	 * @return
 	 */
 	public List<Object> getApplicationQmUser() {
@@ -317,7 +354,6 @@ public @Component class QmUserManager {
 
 	/**
 	 * 在AOP中打印日志
-	 * 
 	 * @param jp
 	 * @return
 	 */
@@ -340,13 +376,80 @@ public @Component class QmUserManager {
 			qmLogger.setRequestParam(Arrays.toString(jp.getArgs()));
 			qmLogger.setRequestURL(request.getRequestURL().toString());
 			qmLogger.setText(qmUserManagerAPI.log());
-			Object user = getQmbject().getBean();
-			String userCode = ApiUtil.getFieldValueByFieldName(USERCODE_FIELD_NAME, user).toString();
-			qmLogger.setOperator(userCode);
+			if(qmUserManagerAPI.needLogin()){
+				Object user = getQmbject().getBean();
+				String userCode = ApiUtil.getFieldValueByFieldName(USERCODE_FIELD_NAME, user).toString();
+				qmLogger.setOperator(userCode);
+			}
 			qmLogger.setCreateTime(new Date());
 			qmLogger.setResponseTime(time);
 			qmUserManagerService.addUserLogger(USER_LOGGER_TABLE_NAME, qmLogger);
 		}
 	}
-
+	
+	/**
+	 * 手动添加日志
+	 * @param qmLogger
+	 * @return
+	 */
+	public boolean addUserLogger(QmLogger qmLogger) {
+		int res = qmUserManagerService.addUserLogger(USER_LOGGER_TABLE_NAME, qmLogger);
+		if (res < 1) {
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * 删除日志
+	 * @param qmLogger
+	 * @return
+	 */
+	public boolean delUserLogger(Integer[] logIds) {
+		int res = qmUserManagerService.delUserLogger(USER_LOGGER_TABLE_NAME,logIds);
+		if (res < 1) {
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * 获取日志列表
+	 * @param qmLogger
+	 * 该方法提供较为全面的搜索功能
+	 * 实体类中只有logId是绝对相等的判断
+	 * 其余字段均为模糊搜索
+	 * 时间搜索时,会检索出设置时间之后的所有日志
+	 * @return
+	 */
+	public List<QmLogger> getUserLogger(QmLogger qmLogger) {
+		return qmUserManagerService.getUserLogger(USER_LOGGER_TABLE_NAME,qmLogger);
+	}
+	
+	
+	/**
+	 * 判断权限数组中是否存在该权限Id
+	 * @param powerIds
+	 * @param powerIdTemp
+	 * @return
+	 */
+	public boolean valueOfPower(Integer[] powerIds,Integer powerIdTemp) {
+		if(powerIds == null || powerIds.length == 0) {
+			// 无权限哦
+			return false;
+		}
+		// 超级管理员是-1
+		for (int i = 0; i < powerIds.length; i++) {
+			if(powerIds[i] == -1) {
+				break;
+			}
+			if (powerIdTemp == powerIds[i]) {
+				break;
+			}
+			if (i + 1 >= powerIds.length) {
+				return false;
+			}
+		}
+		return true;
+	}
 }

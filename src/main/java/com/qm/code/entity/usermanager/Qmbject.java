@@ -6,7 +6,13 @@ package com.qm.code.entity.usermanager;
  * @Description
  */
 public class Qmbject {
+	/**
+	 * 用户角色
+	 */
 	private QmRole qmRole;
+	/**
+	 * 用户对象
+	 */
 	private Object bean;
 	
 

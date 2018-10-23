@@ -24,18 +24,8 @@ public class QmUserManagerServiceImpl implements QmUserManagerService {
 	private QmUserManagerMapper qmUserManagerMapper;
 
 	@Override
-	public List<QmRole> getRole(String tableName, QmRole qmRole) {
-		return qmUserManagerMapper.getRole(tableName, qmRole);
-	}
-
-	@Override
-	public List<QmPower> getPower(String tableName) {
-		return qmUserManagerMapper.getPower(tableName);
-	}
-
-	@Override
-	public Integer changeTableRole(String tableName, QmRole qmRole) {
-		return qmUserManagerMapper.changeRole(tableName, qmRole);
+	public Map<String, Object> login(String sql, String userName, String password) {
+		return qmUserManagerMapper.login(sql, userName, password);
 	}
 
 	@Override
@@ -49,13 +39,39 @@ public class QmUserManagerServiceImpl implements QmUserManagerService {
 	}
 
 	@Override
+	public Integer changeTableRole(String tableName, QmRole qmRole) {
+		return qmUserManagerMapper.changeRole(tableName, qmRole);
+	}
+
+	@Override
+	public List<QmRole> getTableRole(String tableName, QmRole qmRole) {
+		return qmUserManagerMapper.getRole(tableName, qmRole);
+	}
+
+	@Override
+	public List<QmPower> getTablePower(String tableName, QmPower qmPower) {
+		return qmUserManagerMapper.getPower(tableName, qmPower);
+	}
+
+	@Override
 	public Integer addUserLogger(String tableName, QmLogger qmLogger) {
 		return qmUserManagerMapper.addUserLogger(tableName, qmLogger);
 	}
 
 	@Override
-	public Map<String, Object> login(String sql, String userName, String password) {
-		return qmUserManagerMapper.login(sql, userName, password);
+	public Integer delUserLogger(String tableName, Integer[] logIds) {
+		return qmUserManagerMapper.delUserLogger(tableName, logIds);
 	}
+
+	@Override
+	public List<QmPower> getPowersById(String tableName, Integer[] powerIds) {
+		return qmUserManagerMapper.getPowersById(tableName, powerIds);
+	}
+
+	@Override
+	public List<QmLogger> getUserLogger(String tableName, QmLogger qmLogger) {
+		return qmUserManagerMapper.getUserLogger(tableName, qmLogger);
+	}
+
 
 }

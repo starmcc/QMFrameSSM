@@ -5,7 +5,7 @@ import java.util.Date;
 /**
  * @author 浅梦工作室
  * @createDate 2018年9月29日 上午1:37:31
- * @Description 角色实体类
+ * @Description 角色实体
  */
 public class QmRole {
 	/**
@@ -37,8 +37,17 @@ public class QmRole {
 	 */
 	private String powerIds;
 
-	public String getPowerIds() {
-		return powerIds;
+	/**
+	 * 转数组
+	 * @return
+	 */
+	public Integer[] getPowerIds() {
+		String[] temp = powerIds.split(",");
+		Integer[] temp2 = new Integer[temp.length];
+		for (int i = 0; i < temp2.length; i++) {
+			temp2[i] = Integer.parseInt(temp[i]);
+		}
+		return temp2;
 	}
 
 	public void setPowerIds(String powerIds) {
