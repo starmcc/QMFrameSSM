@@ -14,7 +14,7 @@ import redis.clients.jedis.JedisPoolConfig;
  * @Description 调用本类可直接调用方法 无需重新获取连接和关闭连接。 依赖redis.properties
  */
 public class RedisUtil {
-	private static final String URL = PropertiesUtil.get("url"); // ip
+	private static final String URL = PropertiesUtil.get("redis.url"); // ip
 	private static final Integer PORT = Integer.parseInt(PropertiesUtil.get("redis.port")); // 端口
 	private static final String PASSWORD = PropertiesUtil.get("redis.password"); // 密码(原始默认是没有密码)
 	private static final Integer MAX_ACTIVE = Integer.parseInt(PropertiesUtil.get("redis.maxActive")); // 最大连接数
@@ -23,7 +23,6 @@ public class RedisUtil {
 	private static final Integer TIME_OUT = Integer.parseInt(PropertiesUtil.get("redis.timeOut")); // 超时时间
 	private static final boolean BORROW = Boolean.parseBoolean(PropertiesUtil.get("redis.borrow")); // 在borrow一个事例时是否提前进行validate操作
 	private static JedisPool pool = null;
-
 	
 	/**
 	 * 测试
@@ -31,7 +30,6 @@ public class RedisUtil {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// RedisUtils.addValue("aaa", "aaa");
 		RedisUtil.addValue("1", "test");
 		RedisUtil.delKey("1");
 		System.out.println(RedisUtil.get("1"));

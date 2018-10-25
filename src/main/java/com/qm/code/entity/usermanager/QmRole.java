@@ -37,17 +37,8 @@ public class QmRole {
 	 */
 	private String powerIds;
 
-	/**
-	 * 转数组
-	 * @return
-	 */
-	public Integer[] getPowerIds() {
-		String[] temp = powerIds.split(",");
-		Integer[] temp2 = new Integer[temp.length];
-		for (int i = 0; i < temp2.length; i++) {
-			temp2[i] = Integer.parseInt(temp[i]);
-		}
-		return temp2;
+	public String getPowerIds() {
+		return powerIds;
 	}
 
 	public void setPowerIds(String powerIds) {

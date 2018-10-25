@@ -64,7 +64,7 @@ public class QmUserManagerServiceImpl implements QmUserManagerService {
 	}
 
 	@Override
-	public List<QmPower> getPowersById(String tableName, Integer[] powerIds) {
+	public List<QmPower> getPowersById(String tableName, List<Integer> powerIds) {
 		return qmUserManagerMapper.getPowersById(tableName, powerIds);
 	}
 

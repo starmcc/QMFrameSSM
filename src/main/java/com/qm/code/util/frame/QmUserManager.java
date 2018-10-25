@@ -1,6 +1,7 @@
 package com.qm.code.util.frame;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -160,8 +161,6 @@ public @Component class QmUserManager {
 					e.printStackTrace();
 					return 0;
 				}
-			}else {
-				qmbject.setQmRole(onLine.getQmbject().getQmRole());
 			}
 			onLine.setQmbject(qmbject);
 			session.setAttribute(SESSION_KEY, onLine);
@@ -248,7 +247,7 @@ public @Component class QmUserManager {
 	 * 获取权限表
 	 * @return
 	 */
-	public List<QmPower> getAllPowers() {
+	public List<QmPower> getPower() {
 		request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 		ServletContext application = request.getServletContext();
 		@SuppressWarnings("unchecked")
@@ -265,14 +264,22 @@ public @Component class QmUserManager {
 	 * @param qmRole
 	 * @return
 	 */
-	public List<QmPower> getRolePower(QmRole qmRole){
+	public List<QmPower> getRolePower(Integer roleId){
+		QmRole qmRole = new QmRole();
+		qmRole.setRoleId(roleId);
 		List<QmRole> qmRoles = qmUserManagerService.getTableRole(ROLE_TABLE_NAME, qmRole);
 		if(qmRoles == null || qmRoles.size() == 0) {
 			return null;
 		}
 		qmRole = qmRoles.get(0);
-		Integer[] powers = qmRole.getPowerIds();
-		return qmUserManagerService.getPowersById(POWER_TABLE_NAME,powers);
+		String[] powers = qmRole.getPowerIds().split(",");
+		List<Integer> lis = new ArrayList<Integer>();
+		for (int i = 0; i < powers.length; i++) {
+			if(powers[i] != null && !powers[i].trim().equals("")) {
+				lis.add(Integer.parseInt(powers[i]));
+			}
+		}
+		return qmUserManagerService.getPowersById(POWER_TABLE_NAME,lis);
 	}
 	
 	/**
@@ -284,6 +291,9 @@ public @Component class QmUserManager {
 	public boolean settingRolePower(QmRole qmRole,Integer[] powerIds) {
 		List<QmRole> qmRoles = qmUserManagerService.getTableRole(ROLE_TABLE_NAME, qmRole);
 		if (qmRoles == null || qmRoles.size() == 0) {
+			return false;
+		}
+		if (powerIds.length == 0) {
 			return false;
 		}
 		StringBuffer sb = new StringBuffer();
@@ -328,7 +338,12 @@ public @Component class QmUserManager {
 					// 进入权限控制
 					if (MANAGER_POWER_OPEN.trim().equals("true")) {
 						QmRole qmRole = qmbject.getQmRole();
-						return valueOfPower(qmRole.getPowerIds(), qmUserManagerAPI.licence());
+						String[] idsStr = qmRole.getPowerIds().split(",");
+						Integer[] ids = new Integer[idsStr.length];
+						for (int i = 0; i < ids.length; i++) {
+							ids[i] = Integer.parseInt(idsStr[i]);
+						}
+						return valueOfPower(ids, qmUserManagerAPI.licence());
 					}
 				}
 			}
@@ -340,7 +355,7 @@ public @Component class QmUserManager {
 	 * 获取当前正在登录的用户集合(可获取在线列表数,在线列表等)
 	 * @return
 	 */
-	public List<Object> getApplicationLoginList() {
+	public List<Object> getApplicationQmUser() {
 		request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 		ServletContext application = request.getServletContext();
 		@SuppressWarnings("unchecked")
@@ -388,7 +403,7 @@ public @Component class QmUserManager {
 	 * @param qmLogger
 	 * @return
 	 */
-	public boolean addManagerLogger(QmLogger qmLogger) {
+	public boolean addUserLogger(QmLogger qmLogger) {
 		int res = qmUserManagerService.addUserLogger(USER_LOGGER_TABLE_NAME, qmLogger);
 		if (res < 1) {
 			return false;
@@ -401,7 +416,7 @@ public @Component class QmUserManager {
 	 * @param qmLogger
 	 * @return
 	 */
-	public boolean delManagerLogger(Integer[] logIds) {
+	public boolean delUserLogger(Integer[] logIds) {
 		int res = qmUserManagerService.delUserLogger(USER_LOGGER_TABLE_NAME,logIds);
 		if (res < 1) {
 			return false;
@@ -418,7 +433,7 @@ public @Component class QmUserManager {
 	 * 时间搜索时,会检索出设置时间之后的所有日志
 	 * @return
 	 */
-	public List<QmLogger> getManagerLogger(QmLogger qmLogger) {
+	public List<QmLogger> getUserLogger(QmLogger qmLogger) {
 		return qmUserManagerService.getUserLogger(USER_LOGGER_TABLE_NAME,qmLogger);
 	}
 	
@@ -429,7 +444,7 @@ public @Component class QmUserManager {
 	 * @param powerIdTemp
 	 * @return
 	 */
-	private boolean valueOfPower(Integer[] powerIds,Integer powerIdTemp) {
+	public boolean valueOfPower(Integer[] powerIds,Integer powerIdTemp) {
 		if(powerIds == null || powerIds.length == 0) {
 			// 无权限哦
 			return false;

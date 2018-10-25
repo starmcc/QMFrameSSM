@@ -67,7 +67,7 @@ public interface QmUserManagerService {
 	 * @param powerIds
 	 * @return
 	 */
-	List<QmPower> getPowersById(String tableName, Integer[] powerIds);
+	List<QmPower> getPowersById(String tableName, List<Integer> powerIds);
 	
 	/**
 	 * 添加日志

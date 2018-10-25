@@ -37,7 +37,7 @@
 			<if test="role.updateOperator != null">,`updateOperator` = #{role.updateOperator}</if>
 			<if test="role.powerIds != null">,`powerIds` = #{role.powerIds}</if>
 		</if>
-		WHERE `roleId` = #{role.roleId}
+		 WHERE `roleId` = #{role.roleId}
 	</update>
 
 	<!-- 获取角色 -->

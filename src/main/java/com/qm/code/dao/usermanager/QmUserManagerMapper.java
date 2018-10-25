@@ -72,7 +72,7 @@ public interface QmUserManagerMapper {
 	 * @param powerIds
 	 * @return
 	 */
-	List<QmPower> getPowersById(@Param("tableName") String tableName, @Param("powerIds") Integer[] powerIds);
+	List<QmPower> getPowersById(@Param("tableName") String tableName, @Param("powerIds") List<Integer> powerIds);
 
 	/**
 	 * 添加日志
