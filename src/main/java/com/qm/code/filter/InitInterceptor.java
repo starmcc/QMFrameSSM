@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 import com.qm.code.util.frame.ApiUtil;
+import com.qm.code.util.frame.QmCode;
 import com.qm.code.util.frame.QmUserManager;
 import com.qm.code.util.frame.VersionUtil;
 import com.qm.code.util.io.PropertiesUtil;
@@ -40,13 +41,13 @@ public class InitInterceptor implements HandlerInterceptor{
 		//版本控制
 		boolean is = VersionUtil.verify(request);
 		if(!is) {
-			sendFilter(request,response,301,"请求失败,目前不允许该版本进行请求!","");
+			sendFilter(request,response,QmCode.NOT_VERSION,"请求失败,目前不允许该版本进行请求!","");
 			return false;
 		}
 		//登录控制
 		is = qmUserManager.loginFilterVerify(handler);
 		if(!is) {
-			sendFilter(request,response,302,"请求失败,登录状态校验失败!","");
+			sendFilter(request,response,QmCode.NOT_LOGIN_STATUS,"请求失败,登录状态校验失败!","");
 			return false;
 		}
 		return true;
@@ -85,7 +86,7 @@ public class InitInterceptor implements HandlerInterceptor{
 				ApiUtil.sendRequestView(request, code, msg, data);
 				request.getRequestDispatcher(QMFRAME_FILTER_VIEWNAME).forward(request,response);
 			}else {
-				response.getWriter().write(ApiUtil.sendJSON(code, msg, data));
+				response.getWriter().write(ApiUtil.sendJSONmsg(code, msg, data));
 			}
 		} catch (ServletException e) {
 			e.printStackTrace();

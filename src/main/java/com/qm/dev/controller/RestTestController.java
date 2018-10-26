@@ -18,6 +18,7 @@ import com.qm.code.entity.usermanager.Qmbject;
 import com.qm.code.note.QmUserManagerAPI;
 import com.qm.code.util.baidu.BaiduStatisticsUtil;
 import com.qm.code.util.frame.ApiUtil;
+import com.qm.code.util.frame.QmCode;
 import com.qm.code.util.frame.QmUserManager;
 import com.qm.code.util.logger.QmLog;
 import com.qm.dev.entity.Admin;
@@ -53,9 +54,9 @@ public class RestTestController{
 		//参数判断封装类
 		boolean is = ApiUtil.IsEndNullMap(map, "text","userName");
 		if(!is) {
-			return ApiUtil.sendJSON(ApiUtil.CODE_PARAM_ERROR, ApiUtil.errorMsg + "参数错误", "");
+			return ApiUtil.sendJSON(QmCode.PARAM_NOT);
 		}
-		return ApiUtil.sendJSON(ApiUtil.CODE_SUCCESS, "访问成功", "HelloWord");
+		return ApiUtil.sendJSON(QmCode.SUCCESS,"HelloWord");
 	}
 	
 	/**
@@ -70,7 +71,7 @@ public class RestTestController{
 		//此为封装好的登录+监听工具类，直接调用即可登录
 		Qmbject qmbject = qmUserManager.login(Admin.class, "admin", "admin");
 		if(qmbject == null) {
-			return ApiUtil.sendJSON(ApiUtil.CODE_DEFEATED, "未设置该用户的角色", null);
+			return ApiUtil.sendJSONmsg(QmCode.DEFEATED,"未设置该用户的角色");
 		}
 		Admin admin = (Admin) qmbject.getBean();
 		QmRole qmRole = new QmRole();
@@ -78,7 +79,7 @@ public class RestTestController{
 		qmbject.setQmRole(qmRole);
 		qmUserManager.updateQmbject(qmbject);
 		//登录期间可直接调用get方法获取登录用户信息,如果没登录直接为空。
-		return ApiUtil.sendJSON(ApiUtil.CODE_DEFEATED, "登录成功", qmbject);
+		return ApiUtil.sendJSON(QmCode.DEFEATED, qmbject);
 	}
 
 	/**
@@ -89,7 +90,7 @@ public class RestTestController{
 	@GetMapping("/demo3")
 	@QmUserManagerAPI(licence=1)
 	public String demo3(HttpServletRequest request) {
-		return ApiUtil.sendJSON(ApiUtil.CODE_SUCCESS, "通过", "ok");
+		return ApiUtil.sendJSON(QmCode.SUCCESS);
 	}
 	/**
 	 * 测试自定义查询业务调用 + pageHelper分页实例
@@ -100,7 +101,7 @@ public class RestTestController{
 		PageHelper.startPage(1,10);
 		List<Map<String,Object>> map = adminService.getTestList(null);
 		PageInfo<Map<String,Object>> pageInfo = new PageInfo<Map<String,Object>>(map);
-		return ApiUtil.sendJSON(ApiUtil.CODE_SUCCESS, "查询成功", pageInfo);
+		return ApiUtil.sendJSON(QmCode.SUCCESS,pageInfo);
 	}
 
 
@@ -111,7 +112,7 @@ public class RestTestController{
 		String addr2="深圳";
 		Integer distance= BaiduStatisticsUtil.getSeparation(addr1, addr2);
 		QmLog.debug(addr1 + "到" + addr2 + "的distance----->"+ distance + " KM");
-		return ApiUtil.sendJSON(ApiUtil.CODE_SUCCESS, "查询成功", distance);
+		return ApiUtil.sendJSON(QmCode.SUCCESS, distance);
 	}
 	
 }

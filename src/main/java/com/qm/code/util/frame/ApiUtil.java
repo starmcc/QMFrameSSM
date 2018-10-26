@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.codec.binary.Hex;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.ModelAndView;
@@ -28,7 +27,7 @@ import com.qm.code.util.logger.QmLog;
 
 /**
  * @author 浅梦工作室
- * @createDate 2018年8月20日 上午12:57:17
+ * @createDate 2018年10月26日 上午12:57:17
  * @Description 数据请求、返回工具类
  */
 public class ApiUtil {
@@ -37,56 +36,12 @@ public class ApiUtil {
 	private ApiUtil() {};
 	
 	/**
-	 * isEndNullObjectStringValue需要调用的静态变量
-	 */
-	public static String errorMsg = "";
-	/**
-	 * 参数错误时的后缀模板
-	 */
-	private static final String ERROR_MSG_TEMPLATE = "参数错误";
-	//返回code规范常量调用
-	/**
-	 * 成功
-	 */
-	public static final int CODE_SUCCESS = 1;
-	
-	/**
-	 * 失败
-	 */
-	public static final int CODE_DEFEATED = 2;
-	
-	/**
-	 * 参数错误
-	 */
-	public static final int CODE_PARAM_ERROR = 100;
-	
-	/**
-	 * 未知错误
-	 */
-	public static final int CODE_UNKNOWN_ERROR = 200;
-	
-	/**
-	 * 未登录
-	 */
-	public static final int CODE_LOGIN_NOT = 306;
-	
-	/**
-	 * 登录错误
-	 */
-	public static final int CODE_LOGIN_ERROR = 307;
-	
-	/**
-	 * 服务器错误
-	 */
-	public static final int CODE_SERVER_ERROR = 500;
-	
-	/**
-	 * 返回视图层的数据key名
+	 * 返回数据时，使用的最外层key名。
 	 */
 	public static final String QMFRAME_SEND_DATA_KEY = PropertiesUtil.get("qmframe.send.data.key");
 	
 	/**
-	 * 返回视图层的数据key名
+	 * 请求数据时，根据该key名解析数据。
 	 */
 	public static final String QMFRAME_REQUEST_DATA_KEY = PropertiesUtil.get("qmframe.request.data.key");
 	
@@ -158,13 +113,88 @@ public class ApiUtil {
 	/**
 	 * 接口回调方法
 	 * @param code 编码
+	 * @return
+	 */
+	public static String sendJSON(int code) {
+		QmResponse qmResponse = new QmResponse();
+		qmResponse.setCode(code);
+		qmResponse.setMsg(QmCode.getMsg(code));
+		qmResponse.setData(null);
+		Map<String,Object> responseMap = new HashMap<String,Object>();
+		//SerializerFeature.WriteMapNullValue设置后,返回Bean时字段为空时默认返回null
+		String value = JSON.toJSONString(qmResponse,SerializerFeature.WriteMapNullValue);
+		try {
+			if(PropertiesUtil.get("DES3.start").trim().equals("true")) {
+				value = DES3Util.encode(value);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			QmLog.debug("加密失败");
+		}
+		responseMap.put(QMFRAME_SEND_DATA_KEY, value);
+		return JSON.toJSONString(responseMap);
+	}
+
+	/**
+	 * 接口回调方法
+	 * @param code 编码
+	 * @param data 数据
+	 * @return
+	 */
+	public static String sendJSON(int code,Object data) {
+		QmResponse qmResponse = new QmResponse();
+		qmResponse.setCode(code);
+		qmResponse.setMsg(QmCode.getMsg(code));
+		qmResponse.setData(data);
+		Map<String,Object> responseMap = new HashMap<String,Object>();
+		//SerializerFeature.WriteMapNullValue设置后,返回Bean时字段为空时默认返回null
+		String value = JSON.toJSONString(qmResponse,SerializerFeature.WriteMapNullValue);
+		try {
+			if(PropertiesUtil.get("DES3.start").trim().equals("true")) {
+				value = DES3Util.encode(value);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			QmLog.debug("加密失败");
+		}
+		responseMap.put(QMFRAME_SEND_DATA_KEY, value);
+		return JSON.toJSONString(responseMap);
+	}
+	
+	/**
+	 * 接口回调方法(自定义msg)
+	 * @param code 编码
+	 * @param msg 提示信息
+	 * @return
+	 */
+	public static String sendJSONmsg(int code,String msg) {
+		QmResponse qmResponse = new QmResponse();
+		qmResponse.setCode(code);
+		qmResponse.setMsg(msg);
+		qmResponse.setData(null);
+		Map<String,Object> responseMap = new HashMap<String,Object>();
+		//SerializerFeature.WriteMapNullValue设置后,返回Bean时字段为空时默认返回null
+		String value = JSON.toJSONString(qmResponse,SerializerFeature.WriteMapNullValue);
+		try {
+			if(PropertiesUtil.get("DES3.start").trim().equals("true")) {
+				value = DES3Util.encode(value);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			QmLog.debug("加密失败");
+		}
+		responseMap.put(QMFRAME_SEND_DATA_KEY, value);
+		return JSON.toJSONString(responseMap);
+	}
+	
+	/**
+	 * 接口回调方法(自定义msg)
+	 * @param code 编码
 	 * @param msg 提示信息
 	 * @param data 数据
 	 * @return
 	 */
-	public static String sendJSON(int code,String msg,Object data) {
-		//示例
-		//ResponseDataUtil.sendJSON(1,"信息", "obj数据");
+	public static String sendJSONmsg(int code,String msg,Object data) {
 		QmResponse qmResponse = new QmResponse();
 		qmResponse.setCode(code);
 		qmResponse.setMsg(msg);
@@ -183,7 +213,6 @@ public class ApiUtil {
 		responseMap.put(QMFRAME_SEND_DATA_KEY, value);
 		return JSON.toJSONString(responseMap);
 	}
-	
 	
 	/**
 	 * 传递MVC的model值封装
@@ -219,6 +248,22 @@ public class ApiUtil {
 	
 	/**
 	 * 传递MVC的model值封装
+	 * @param modelAndView
+	 * @param code
+	 * @param msg
+	 * @param data
+	 */
+	public static void sendRequestView(ModelAndView modelAndView,int code,String msg) {
+		QmResponse qmResponse = new QmResponse();
+		qmResponse.setCode(code);
+		qmResponse.setMsg(msg);
+		qmResponse.setData(null);
+		modelAndView.addObject(QMFRAME_SEND_DATA_KEY, qmResponse);
+		return;
+	}
+	
+	/**
+	 * 传递MVC的model值封装
 	 * @param request
 	 * @param code
 	 * @param msg
@@ -234,8 +279,23 @@ public class ApiUtil {
 	}
 	
 	/**
-	 * 判断对象中字段值是否存在null，如果有null返回false,调用此类中的errorMsg可以查看哪个字段为null。
-	 * 注意，这里只能检测可以转成String类型的Object
+	 * 传递MVC的model值封装
+	 * @param request
+	 * @param code
+	 * @param msg
+	 * @param data
+	 */
+	public static void sendRequestView(HttpServletRequest request,int code,String msg) {
+		QmResponse qmResponse = new QmResponse();
+		qmResponse.setCode(code);
+		qmResponse.setMsg(msg);
+		qmResponse.setData(null);
+		request.setAttribute(QMFRAME_SEND_DATA_KEY, qmResponse);
+		return;
+	}
+	
+	/**
+	 * 判断对象中字段值是否存在null,包括空字符串。
 	 * @param object 操作对象
 	 * @param fieldNames 字段名
 	 * @return
@@ -250,21 +310,19 @@ public class ApiUtil {
 			for (int i = 0; i < fieldNames.length; i++) {
 				if(field2.getName().equals(fieldNames[i])) {
 					if(tempObj == null || tempObj.toString().trim().equals("")) {
-						errorMsg = field2.getName() + ERROR_MSG_TEMPLATE;
+//						field2.getName()
 						return false;
 					}
 				}
 			}
 		}
-		errorMsg = "IsEndNullObjectValue ok";
 		return true;
 	}
 	
 	
 	
 	/**
-	 * 判断Map中是否存在指定key和value是否为空，为空返回false。这里为空包括空字符串
-	 * 返回false时,该工具类的errorMsg信息会更新为开key值
+	 * 判断Map中是否存在指定key和value是否为空，包括空字符串。
 	 * @param map 操作map
 	 * @param keys key
 	 * @return
@@ -282,65 +340,24 @@ public class ApiUtil {
 					if(entry.getKey().equals(key)){//找key对应
 						//找对应的value判断是否为空
 				    	if(entry.getValue() == null || entry.getValue().toString().trim().equals("")) {
-				    		errorMsg = key;
 				    		return false;
 				    	}
 				    	is = true;
 						break;
 					}
 					if(i >= map.size() && !is) {//如果到最大值后,没有跳出循环,就找不到该key了
-						errorMsg = key;
 						return false;
 					}
 				}
 			}
-		}else {
-			errorMsg = "检测不到传递数据";
-			return false;
 		}
-		errorMsg = "requestMapIsEndNull ok";
 		return true;
 	}
 	
-	/**
-	 * 获取并转化JSON对象
-	 * @param JsonStr
-	 * @param className
-	 * @return
-	 */
-	public static <T> T getJsonToBean(String jsonStr,Class<T> clamm) {
-		T obj;
-		if(jsonStr != null) {
-			try {
-				obj = JSON.parseObject(jsonStr,clamm);
-			} catch (Exception e1) {
-				obj = null;
-			}
-		}else {
-			obj = null;
-		}
-		return obj;
-	}
-	
-	/**
-	 * 获取并转化JSON数组为List
-	 * @param jsonStr
-	 * @return
-	 */
-	public static <T> List<T> getJsonToList(String jsonStr,Class<T> clamm){
-		if(jsonStr == null || jsonStr.trim().equals("")) {
-			return null;
-		}
-		JSONArray jsonArray = JSONArray.parseArray(jsonStr);
-		List<T> lis = jsonArray.toJavaList(clamm);
-		return lis;
-	}
-	
-
 
 	/**
 	 * QM浅梦-类对象反射赋值封装方法
-	 * 指定实体类对象中的所有类型为type的字段，当值为value时,设置为newValue.
+	 * 指定实体类对象中的字段类型为type的字段,当值为value时,将其设置为newValue
 	 * @param obj 将要操作的对象
 	 * @param fieldType 将要操作的对象中存在字段的类型名
 	 * @param value	需要替换的值
@@ -382,7 +399,7 @@ public class ApiUtil {
 	}
 	
 	/**
-	 * QM-浅梦 过滤对象或实体类中指定的字段,并转化为map对象
+	 * QM-浅梦 过滤对象或实体类中指定的fieldNames字段名,并转化为map对象
 	 * 在实际中，返回数据到前端时，直接传对象会造成多余数据，用此方法减少多余字段。
 	 * @param obj 需要操作的对象
 	 * @param fieldName 多个参数列表,需要过滤掉的字段名
@@ -540,4 +557,39 @@ public class ApiUtil {
         }
         return t;
     }
+	
+	
+	/**
+	 * 获取并转化JSON对象
+	 * @param JsonStr
+	 * @param className
+	 * @return
+	 */
+	public static <T> T getJsonToBean(String jsonStr,Class<T> clamm) {
+		T obj;
+		if(jsonStr != null) {
+			try {
+				obj = JSON.parseObject(jsonStr,clamm);
+			} catch (Exception e1) {
+				obj = null;
+			}
+		}else {
+			obj = null;
+		}
+		return obj;
+	}
+	
+	/**
+	 * 获取并转化JSON数组为List
+	 * @param jsonStr
+	 * @return
+	 */
+	public static <T> List<T> getJsonToList(String jsonStr,Class<T> clamm){
+		if(jsonStr == null || jsonStr.trim().equals("")) {
+			return null;
+		}
+		JSONArray jsonArray = JSONArray.parseArray(jsonStr);
+		List<T> lis = jsonArray.toJavaList(clamm);
+		return lis;
+	}
 }

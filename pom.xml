@@ -10,6 +10,23 @@
 	<url>http://maven.apache.org</url>
 	<build>
 		<finalName>QMFrame</finalName>
+		<resources>   
+       		<resource>
+		        <directory>src/main/java</directory>
+		        <includes>
+		            <include>**/*.xml</include>
+		        </includes>
+		        <filtering>true</filtering>
+		    </resource>
+		    <resource>
+		        <directory>src/main/resources</directory>
+		        <includes>
+		            <include>**/*.properties</include>
+		            <include>**/*.xml</include>
+		            <include>**/*.tld</include>
+		        </includes>
+		    </resource>
+		</resources>
 	</build>
 	
 	<!-- 指明编译源代码时使用的字符编码，maven编译的时候默认使用的GBK编码 通过project.build.sourceEncoding属性设置字符编码 
