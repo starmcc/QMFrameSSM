@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:mvc="http://www.springframework.org/schema/mvc"
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xsi:schemaLocation="
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
         http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context
@@ -13,65 +13,60 @@
         http://www.springframework.org/schema/aop/spring-aop.xsd
         http://www.springframework.org/schema/mvc
         http://www.springframework.org/schema/mvc/spring-mvc.xsd">
-	<!-- SpringMVC注解驱动 -->
-	<mvc:annotation-driven>
-		<mvc:message-converters>
-			<bean
-				class="org.springframework.http.converter.StringHttpMessageConverter">
-				<property name="supportedMediaTypes">
-					<list>
-						<value>application/json;charset=UTF-8</value>
-						<value>text/plain;charset=utf-8</value>
-						<value>text/html;charset=UTF-8</value>
-					</list>
-				</property>
-			</bean>
-		</mvc:message-converters>
-	</mvc:annotation-driven>
-	<!-- SpringMVC注解驱动End -->
-	<!-- 拦截器 -->
-	<mvc:interceptors>
-		<!-- 使用bean定义一个Interceptor，直接定义在mvc:interceptors根下面的Interceptor将拦截所有的请求 -->
-		<mvc:interceptor>
-			<mvc:mapping path="/**" />
-			<!-- 需排除拦截的地址 -->
-			<mvc:exclude-mapping path="/" />
-			<mvc:exclude-mapping path="/test" />
-			<!-- 定义在mvc:interceptor下面的表示是对特定的请求才进行拦截的 -->
-			<bean class="com.qm.frame.qmsecurity.basic.QmSecurityInterceptor" />
-		</mvc:interceptor>
-		<!-- 上面配置请勿修改，需要增加拦截器请在下面增加 例如这样
-		<mvc:interceptor> <mvc:mapping path="/**" />
-			<mvc:exclude-mapping path="/" />
-			<mvc:exclude-mapping path="/test" />
-			<bean class="com.qm.codee.filter.xxxxx" />
-		</mvc:interceptor> -->
-	</mvc:interceptors>
-	<!-- 扫描controller包下和其子包下的所有注解 -->
-	<context:component-scan base-package="com.qm" use-default-filters="false">
-		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" />
-		<context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice" />
-	</context:component-scan>
-	<!-- 静态资源交给default-servlet处理 -->
-	<mvc:default-servlet-handler/>
-	<!-- AOP注解所需 -->
-	<!-- AOP的增强处理类 -->
-	<!-- <bean id="loggerWhole" class="com.qm.framee.aop.LoggerWhole" /> -->
-	<!-- 启动对spring AOP的AspectJ注解的支持 -->
-	<aop:aspectj-autoproxy />
-	<!-- Spring注解扫描支持End -->
+    <!-- SpringMVC注解驱动 -->
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>application/json;charset=UTF-8</value>
+                        <value>text/plain;charset=utf-8</value>
+                        <value>text/html;charset=UTF-8</value>
+                    </list>
+                </property>
+            </bean>
+        </mvc:message-converters>
+        <!-- 自定义解析json数据 -->
+        <mvc:argument-resolvers>
+            <bean class="com.qm.frame.basic.body.JsonPathArgumentResolver"/>
+        </mvc:argument-resolvers>
+    </mvc:annotation-driven>
+    <!-- SpringMVC注解驱动End -->
+    <!-- 拦截器 -->
+    <mvc:interceptors>
+        <!-- 使用bean定义一个Interceptor，直接定义在mvc:interceptors根下面的Interceptor将拦截所有的请求 -->
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <!-- 需排除拦截的地址 -->
+            <mvc:exclude-mapping path="/"/>
+            <mvc:exclude-mapping path="/test"/>
+            <!-- 定义在mvc:interceptor下面的表示是对特定的请求才进行拦截的 -->
+            <bean class="com.qm.frame.qmsecurity.basic.QmSecurityInterceptor"/>
+        </mvc:interceptor>
+        <!-- 上面配置请勿修改，需要增加拦截器请在下面增加 例如这样 -->
+    <!--<mvc:interceptor> <mvc:mapping path="/**" />
+            <mvc:exclude-mapping path="/" />
+            <mvc:exclude-mapping path="/test" />
+            <bean class="com.qm.codee.filter.xxxxx" />
+        </mvc:interceptor>-->
+    </mvc:interceptors>
+    <!-- 扫描controller包下和其子包下的所有注解 -->
+    <context:component-scan base-package="com" use-default-filters="false">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+        <context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+    </context:component-scan>
+    <!-- 静态资源交给default-servlet处理 -->
+    <mvc:default-servlet-handler/>
+    <!-- AOP注解所需 -->
+    <!-- AOP的增强处理类 -->
+    <!-- <bean id="loggerWhole" class="com.qm.framee.aop.LoggerWhole" /> -->
+    <!-- 启动对spring AOP的AspectJ注解的支持 -->
+    <aop:aspectj-autoproxy/>
 
-	<!-- 配置视图解析器 /WEB-INF/jsp/xxx.jsp -->
-	<!-- 提取url中的前后地址,提供给Spring MVC一个逻辑视图名 -->
-	<bean
-		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-		<property name="prefix" value="/WEB-INF/" />
-		<property name="suffix" value=".jsp" />
-	</bean>
-	<bean id="config"
-		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="location">
-			<value>classpath:base.properties</value>
-		</property>
-	</bean>
+    <!-- 配置视图解析器 /WEB-INF/jsp/xxx.jsp -->
+    <!-- 提取url中的前后地址,提供给Spring MVC一个逻辑视图名 -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
 </beans>

@@ -8,6 +8,7 @@
 <title>QM_SSMFrame</title>
 </head>
 <body>
-	${value}欢迎进入QM_SSMFrame的世界！
+	欢迎进入QM_SSMFrame的世界！
+	用户名：<p>${userName}</p>
 </body>
 </html>
