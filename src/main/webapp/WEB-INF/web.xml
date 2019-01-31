@@ -25,7 +25,7 @@
 	</context-param>
 	<context-param>
 		<param-name>webAppRootKey</param-name>
-		<param-value>QMFrame.root</param-value>
+		<param-value>QMFrameSSM.root</param-value>
 	</context-param>
 	<filter>
 		<filter-name>SpringMVC_EncodingFilter</filter-name>
@@ -67,7 +67,4 @@
 		<servlet-name>SpringMVC</servlet-name>
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
-	<listener>
-		<listener-class>com.qm.code.listener.QmLoginOnLine</listener-class>
-	</listener>
 </web-app>

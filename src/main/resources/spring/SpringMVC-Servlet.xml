@@ -38,13 +38,13 @@
 			<mvc:exclude-mapping path="/" />
 			<mvc:exclude-mapping path="/test" />
 			<!-- 定义在mvc:interceptor下面的表示是对特定的请求才进行拦截的 -->
-			<bean class="com.qm.code.filter.InitInterceptor" />
+			<bean class="com.qm.frame.qmsecurity.basic.QmSecurityInterceptor" />
 		</mvc:interceptor>
-		<!-- 上面配置请勿修改，需要增加拦截器请在下面增加 例如这样 
-		<mvc:interceptor> <mvc:mapping path="/**" /> 
-			<mvc:exclude-mapping path="/" /> 
-			<mvc:exclude-mapping path="/test" /> 
-			<bean class="com.qm.dev.filter.xxxxx" /> 
+		<!-- 上面配置请勿修改，需要增加拦截器请在下面增加 例如这样
+		<mvc:interceptor> <mvc:mapping path="/**" />
+			<mvc:exclude-mapping path="/" />
+			<mvc:exclude-mapping path="/test" />
+			<bean class="com.qm.codee.filter.xxxxx" />
 		</mvc:interceptor> -->
 	</mvc:interceptors>
 	<!-- 扫描controller包下和其子包下的所有注解 -->
@@ -56,7 +56,7 @@
 	<mvc:default-servlet-handler/>
 	<!-- AOP注解所需 -->
 	<!-- AOP的增强处理类 -->
-	<!-- <bean id="loggerWhole" class="com.qm.code.aop.LoggerWhole" /> -->
+	<!-- <bean id="loggerWhole" class="com.qm.framee.aop.LoggerWhole" /> -->
 	<!-- 启动对spring AOP的AspectJ注解的支持 -->
 	<aop:aspectj-autoproxy />
 	<!-- Spring注解扫描支持End -->
@@ -71,8 +71,7 @@
 	<bean id="config"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="location">
-			<value>classpath:config.properties</value>
+			<value>classpath:base.properties</value>
 		</property>
 	</bean>
-	<!-- <context:property-placeholder ignore-unresolvable="true" location="classpath:config.properties" /> -->
 </beans>

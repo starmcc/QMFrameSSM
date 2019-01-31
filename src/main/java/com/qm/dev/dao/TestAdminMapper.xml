@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper
- PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
- "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<!-- 备注:框架中已提供最原始的请提供通用SQL方法,这里只编写复杂sql方法 -->
-<mapper namespace="com.qm.dev.dao.TestAdminMapper">
-</mapper>
