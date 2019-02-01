@@ -3,7 +3,6 @@ package com.qm.frame.basic.util;
 import com.qm.frame.basic.config.QmFrameConcent;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggerFactory;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -26,8 +25,8 @@ public class AESUtil {
     public static String encryptAES(String data) throws Exception {
         Date date = new Date();
         String str = data;
-        for (int i = 0; i < QmFrameConcent.AES_NUMBER; i++){
-            str = encryptAES(str, QmFrameConcent.AES_KEY);
+        for (int i = 0; i < QmFrameConcent.BODY_AES_NUMBER; i++){
+            str = encryptAES(str, QmFrameConcent.BODY_AES_KEY);
         }
         LOG.debug("加密用时：" + (new Date().getTime() - date.getTime()));
         return str;
@@ -41,8 +40,8 @@ public class AESUtil {
     public static String decryptAES(String data) throws Exception {
         Date date = new Date();
         String str = data;
-        for (int i = 0; i < QmFrameConcent.AES_NUMBER; i++){
-            str = decryptAES(str, QmFrameConcent.AES_KEY);
+        for (int i = 0; i < QmFrameConcent.BODY_AES_NUMBER; i++){
+            str = decryptAES(str, QmFrameConcent.BODY_AES_KEY);
         }
         LOG.debug("解密用时：" + (new Date().getTime() - date.getTime()));
         return str;
@@ -65,7 +64,7 @@ public class AESUtil {
         SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
-        byte[] encryptedData = cipher.doFinal(data.getBytes(QmFrameConcent.AES_ENCODING));
+        byte[] encryptedData = cipher.doFinal(data.getBytes(QmFrameConcent.BODY_AES_ENCODING));
         String hexStr = Base64.encodeBase64String(encryptedData);
         return hexStr;
     }
@@ -90,7 +89,7 @@ public class AESUtil {
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.DECRYPT_MODE, skeySpec);
         byte[] decryptedData = cipher.doFinal(Base64.decodeBase64(data));
-        String respStr = new String(decryptedData, QmFrameConcent.AES_ENCODING);
+        String respStr = new String(decryptedData, QmFrameConcent.BODY_AES_ENCODING);
         return respStr;
     }
 

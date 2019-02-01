@@ -1,6 +1,5 @@
 package com.qm.code.service;
 
-import com.qm.code.entity.Rights;
 import com.qm.code.entity.User;
 
 import java.util.List;
@@ -21,12 +20,4 @@ public interface UserService {
      * @return
      */
     User login(String userName,String password);
-
-    /**
-     * 根据角色id获取权限集合
-     * @param roleId
-     * @return
-     */
-    List<Rights> getRightsList(Integer roleId);
-
 }

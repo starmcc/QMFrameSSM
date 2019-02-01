@@ -32,24 +32,15 @@
         </mvc:argument-resolvers>
     </mvc:annotation-driven>
     <!-- SpringMVC注解驱动End -->
-    <!-- 拦截器 -->
-    <mvc:interceptors>
-        <!-- 使用bean定义一个Interceptor，直接定义在mvc:interceptors根下面的Interceptor将拦截所有的请求 -->
-        <mvc:interceptor>
-            <mvc:mapping path="/**"/>
-            <!-- 需排除拦截的地址 -->
-            <mvc:exclude-mapping path="/"/>
-            <mvc:exclude-mapping path="/test"/>
-            <!-- 定义在mvc:interceptor下面的表示是对特定的请求才进行拦截的 -->
-            <bean class="com.qm.frame.qmsecurity.basic.QmSecurityInterceptor"/>
-        </mvc:interceptor>
-        <!-- 上面配置请勿修改，需要增加拦截器请在下面增加 例如这样 -->
-    <!--<mvc:interceptor> <mvc:mapping path="/**" />
-            <mvc:exclude-mapping path="/" />
-            <mvc:exclude-mapping path="/test" />
-            <bean class="com.qm.codee.filter.xxxxx" />
-        </mvc:interceptor>-->
-    </mvc:interceptors>
+    <!--&lt;!&ndash; 拦截器 &ndash;&gt;-->
+    <!--<mvc:interceptors>-->
+        <!--&lt;!&ndash; 需要增加拦截器请在下面增加 例如这样 &ndash;&gt;-->
+        <!--<mvc:interceptor> <mvc:mapping path="/**" />-->
+            <!--<mvc:exclude-mapping path="/" />-->
+            <!--<mvc:exclude-mapping path="/test" />-->
+            <!--<bean class="com.qm.xxx.xxx.xxxxx" />-->
+        <!--</mvc:interceptor>-->
+    <!--</mvc:interceptors>-->
     <!-- 扫描controller包下和其子包下的所有注解 -->
     <context:component-scan base-package="com" use-default-filters="false">
         <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>

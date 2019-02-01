@@ -139,7 +139,7 @@ public enum QmCode {
 			msg = "ip is error";
 			break;
 		case _105:
-			msg = "Login verify error";
+			msg = "Token verify error";
 			break;
 		case _106:
 			msg = "role is null";

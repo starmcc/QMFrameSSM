@@ -93,10 +93,10 @@ public @Component class QmController {
         String value = JSONObject.toJSONString(responseMap, SerializerFeature.WriteMapNullValue);
         value = StringEscapeUtils.unescapeJava(value);
         try {
-            if (QmFrameConcent.AES_START) {
+            if (QmFrameConcent.BODY_AES_START) {
                 value = AESUtil.encryptAES(value);
                 Map<String,String> resMap = new HashMap<>();
-                resMap.put(QmFrameConcent.RESPONSE_DATA_KEY,value);
+                resMap.put(QmFrameConcent.BODY_RESPONSE_KEY,value);
                 return StringEscapeUtils.unescapeJava(JSONObject.toJSONString(resMap,SerializerFeature.WriteMapNullValue));
             }
         } catch (Exception e) {
@@ -104,7 +104,7 @@ public @Component class QmController {
             LOG.debug("加密失败");
         }
         Map<String,Map<String,Object>> resMap = new HashMap<>();
-        resMap.put(QmFrameConcent.RESPONSE_DATA_KEY,responseMap);
+        resMap.put(QmFrameConcent.BODY_RESPONSE_KEY,responseMap);
         return StringEscapeUtils.unescapeJava(JSONObject.toJSONString(resMap,SerializerFeature.WriteMapNullValue));
     }
 }

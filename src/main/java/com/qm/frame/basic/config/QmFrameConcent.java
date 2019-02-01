@@ -20,64 +20,32 @@ public class QmFrameConcent {
     /**
      * 是否启用AES对称加密传输
      */
-    public final static boolean AES_START = Boolean.parseBoolean(PRO.getProperty("aes.start"));
+    public final static boolean BODY_AES_START = Boolean.parseBoolean(PRO.getProperty("body.aes.start","false"));
     /**
      * AES秘钥
      */
-    public final static String AES_KEY = PRO.getProperty("aes.key");
+    public final static String BODY_AES_KEY = PRO.getProperty("body.aes.key","20190101000000qmframe");
     /**
      * 统一使用的编码方式
      */
-    public final static String AES_ENCODING = PRO.getProperty("aes.encoding");
+    public final static String BODY_AES_ENCODING = PRO.getProperty("body.aes.encoding","UTF-8");
     /**
      * 加密次数
      */
-    public final static int AES_NUMBER = Integer.parseInt(PRO.getProperty("aes.number"));
+    public final static int BODY_AES_NUMBER = Integer.parseInt(PRO.getProperty("body.aes.number","1"));
     /**
      * 请求数据时，根据该key名解析数据(rest风格)
      */
-    public final static String REQUEST_DATA_KEY = PRO.getProperty("request.data-key");
+    public final static String BODY_REQUEST_KEY = PRO.getProperty("body.request.key","value");
     /**
      * 返回数据时，使用的最外层key名(rest风格)
      */
-    public final static String RESPONSE_DATA_KEY = PRO.getProperty("response.data-key");
-    /**
-     * 是否开启版本控制(ture时,每个请求需在header带上version参数,参数值version)
-     */
-    public final static Boolean VERSION_START = Boolean.parseBoolean(PRO.getProperty("version.start"));
-    /**
-     * 系统目前版本编号
-     */
-    public final static String VERSION_NOW = PRO.getProperty("version.now");
-
-    /**
-     * 系统容忍请求版本编号(默认允许当前版本)
-     */
-    public final static List<String> VERSION_ALLOWS = getVersionAllows();
+    public final static String BODY_RESPONSE_KEY = PRO.getProperty("body.response.key","value");
     /**
      * 记录日志类路径
      */
-    public final static String LOGGER_AOP_EXTEND_CLASS = PRO.getProperty("controller.aop.extend.class");
+    public final static String LOGGER_AOP_EXTEND_CLASS = PRO.getProperty("controller.aop.extend.class","");
 
-    /**
-     * 获取允许版本号
-     * @return
-     */
-    private final static List<String> getVersionAllows(){
-        List<String> allows = new ArrayList<>();
-        boolean is = true;
-        int num = 0;
-        while (is){
-            String tempVersion = PRO.getProperty("version.allows-[" + num + "]",null);
-            if (tempVersion != null) {
-                allows.add(tempVersion);
-            }else{
-                is = false;
-            }
-            num++;
-        }
-        return allows;
-    }
 
     private final static Properties getProperties(){
         try {

@@ -6,7 +6,7 @@
 	<artifactId>QMFrameSSM</artifactId>
 	<packaging>war</packaging>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>QMFrame</name>
+	<name>QMFrameSSM</name>
 	<url>http://maven.apache.org</url>
 	<build>
 		<finalName>QMFrameSSM</finalName>
