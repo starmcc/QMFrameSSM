@@ -8,7 +8,6 @@
 <title>QM_SSMFrame</title>
 </head>
 <body>
-	欢迎进入QM_SSMFrame的世界！
-	用户名：<span>${user.userName}</span>
+	您没有足够的权限访问！
 </body>
 </html>

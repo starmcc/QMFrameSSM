@@ -1,6 +1,6 @@
 package com.qm.frame.qmsecurity.util;
 
-import com.qm.frame.qmsecurity.config.QmSercurityContent;
+import com.qm.frame.qmsecurity.config.QmSecurityContent;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
@@ -25,8 +25,8 @@ public class QmSecurityAESUtil {
     public static String encryptAES(String data) throws Exception {
         Date date = new Date();
         String str = data;
-        for (int i = 0; i < QmSercurityContent.TOKEN_ENCRYPT_NUMBER; i++){
-            str = encryptAES(str, QmSercurityContent.TOKEN_SECRET,QmSercurityContent.TOKEN_SECRET_ENCODING);
+        for (int i = 0; i < QmSecurityContent.TOKEN_ENCRYPT_NUMBER; i++){
+            str = encryptAES(str, QmSecurityContent.TOKEN_SECRET, QmSecurityContent.TOKEN_SECRET_ENCODING);
         }
         LOG.debug("加密用时：" + (new Date().getTime() - date.getTime()));
         return str;
@@ -40,8 +40,8 @@ public class QmSecurityAESUtil {
     public static String decryptAES(String data) throws Exception {
         Date date = new Date();
         String str = data;
-        for (int i = 0; i < QmSercurityContent.TOKEN_ENCRYPT_NUMBER; i++){
-            str = decryptAES(str, QmSercurityContent.TOKEN_SECRET,QmSercurityContent.TOKEN_SECRET_ENCODING);
+        for (int i = 0; i < QmSecurityContent.TOKEN_ENCRYPT_NUMBER; i++){
+            str = decryptAES(str, QmSecurityContent.TOKEN_SECRET, QmSecurityContent.TOKEN_SECRET_ENCODING);
         }
         LOG.debug("解密用时：" + (new Date().getTime() - date.getTime()));
         return str;

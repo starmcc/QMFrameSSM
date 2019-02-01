@@ -8,9 +8,11 @@
 <title>QM_SSMFrame</title>
 </head>
 <body>
-	用户名：<input id="userName" type="text" name="userName" />
-	密码：<input id="password" type="password" name="password" />
+	用户名：<input id="userName" type="text" name="userName" value="admin" />
+	密码：<input id="password" type="password" name="password" value="123" />
 	<button type="button" id="commit" onclick="login()">提交</button>
+<br/>
+<p id="msg" style="color: red;"></p>
 </body>
 <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
 <script>
@@ -26,12 +28,16 @@
 		}
 
 		$.ajax({
-			url:"http://localhost:8080/QMFrame/api/login",
+			url:"http://localhost:8080/jsp/doLogin",
 			type:"post",
 			dataType:"json",
 			data:JSON.stringify(body),
 			success:function(res){
-				console.info(res)
+				if (res.value.code === 1){
+					window.location.href = "http://localhost:8080/jsp/index"
+				} else {
+					$("#msg").text(res.value.msg)
+				}
 			},
 			error:function(res){
 				console.info("error！" + res)

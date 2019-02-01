@@ -50,7 +50,7 @@ public class ApiController extends QmController {
         infoMap.put("loginTime",new Date().toString());
         qmTokenInfo.setInfoMap(infoMap);
         // 登录有效10分钟
-        qmbject.login(qmTokenInfo,60 * 10);
-        return super.sendJSON(QmCode._1,userName);
+        String token = qmbject.login(qmTokenInfo,60 * 10);
+        return super.sendJSON(QmCode._1,token);
     }
 }

@@ -5,7 +5,7 @@ import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.qm.frame.basic.util.HttpApiUtil;
 import com.qm.frame.qmsecurity.basic.QmSecurityRealm;
-import com.qm.frame.qmsecurity.config.QmSercurityContent;
+import com.qm.frame.qmsecurity.config.QmSecurityContent;
 import com.qm.frame.qmsecurity.entity.QmPermissions;
 import com.qm.frame.qmsecurity.entity.QmTokenInfo;
 import com.qm.frame.qmsecurity.util.QmSecurityAESUtil;
@@ -16,6 +16,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.*;
 
 /**
@@ -90,7 +91,7 @@ public class QmSecurityManager implements Qmbject {
         builder.withIssuedAt(new Date(currentTimeMillis));
         try {
             // 将这些信息生成token签名
-            String token  = builder.sign(Algorithm.HMAC256(QmSercurityContent.TOKEN_SECRET));
+            String token  = builder.sign(Algorithm.HMAC256(QmSecurityContent.TOKEN_SECRET));
             // AES加密手段
             token = QmSecurityAESUtil.encryptAES(token);
             return token;
@@ -100,8 +101,15 @@ public class QmSecurityManager implements Qmbject {
         return null;
     }
 
-
-
+    @Override
+    public void login(Object user, List<String> matchUrls) {
+        HttpSession session = request.getSession();
+        UserListener userListener = new UserListener();
+        userListener.setUser(user);
+        userListener.setMatchUrls(matchUrls);
+        session.setAttribute("QmSecurity_Session_User", userListener);
+        session.setMaxInactiveInterval(QmSecurityContent.SESSION_OUTTIME);
+    }
 
     @Override
     public QmPermissions extractQmPermissions(final int roleId,final boolean isNew) {
@@ -131,7 +139,7 @@ public class QmSecurityManager implements Qmbject {
         // 如果是空的则也使用调用者提供的方法去获取
         if (qmPermissions == null) {
             qmPermissions = new QmPermissions();
-            List<String> matchUrls = QmSercurityContent.SECURITY_REALM.authorizationPermissions(roleId);
+            List<String> matchUrls = QmSecurityContent.SECURITY_REALM.authorizationPermissions(roleId);
             qmPermissions.setRoleId(roleId);
             qmPermissions.setMatchUrls(matchUrls);
             QmPermissionsLis.add(qmPermissions);
@@ -167,4 +175,8 @@ public class QmSecurityManager implements Qmbject {
         }
     }
 
+    @Override
+    public UserListener getUserListener() {
+        return (UserListener) request.getSession().getAttribute("QmSecurity_Session_User");
+    }
 }

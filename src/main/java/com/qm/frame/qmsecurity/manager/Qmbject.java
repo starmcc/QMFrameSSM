@@ -17,12 +17,20 @@ public interface Qmbject {
 
 
     /**
-     * 登录
+     * token模式登录
      * @param qmTokenInfo 参与签名的信息对象
      * @param expireTime  有效时长(秒单位)
      * @return
      */
     String login(final QmTokenInfo qmTokenInfo, final long expireTime);
+
+
+    /**
+     * session模式登录
+     * @param user 储存的登录对象
+     * @param matchUrls 储存的权限集合
+     */
+    void login(final Object user,final List<String> matchUrls);
 
 
     /**
@@ -52,5 +60,11 @@ public interface Qmbject {
      * @return
      */
     QmTokenInfo getTokenInfo();
+
+    /**
+     * 获取通过校验的session信息
+     * @return
+     */
+    UserListener getUserListener();
 
 }

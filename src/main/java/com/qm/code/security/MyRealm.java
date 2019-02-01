@@ -1,8 +1,12 @@
 package com.qm.code.security;
 
+import com.qm.code.entity.Rights;
+import com.qm.code.service.UserService;
 import com.qm.frame.qmsecurity.basic.QmSecurityRealm;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,10 +19,17 @@ import java.util.List;
 @Component
 public class MyRealm implements QmSecurityRealm {
 
+    @Autowired
+    private UserService userService;
 
     @Override
     public List<String> authorizationPermissions(int roleId) {
-        return null;
+        List<Rights> rightsList = userService.getRightsList(roleId);
+        List<String> matchUrls = new ArrayList<>();
+        for (Rights rights : rightsList) {
+            matchUrls.add(rights.getMatchUrl());
+        }
+        return matchUrls;
     }
 
 

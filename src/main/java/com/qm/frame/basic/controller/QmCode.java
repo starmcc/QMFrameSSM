@@ -67,7 +67,7 @@ public enum QmCode {
 	 */
 	_104(104),
 	/**
-	 * 登录过期，Token失效
+	 * 登录过期失效
 	 */
 	_105(105),
 	/**
@@ -139,7 +139,7 @@ public enum QmCode {
 			msg = "ip is error";
 			break;
 		case _105:
-			msg = "Token verify error";
+			msg = "Login verify error";
 			break;
 		case _106:
 			msg = "role is null";

@@ -3,6 +3,7 @@ package com.qm.frame.qmsecurity.config;
 import com.qm.frame.basic.config.QmFrameConcent;
 import com.qm.frame.basic.exception.QmFrameException;
 import com.qm.frame.qmsecurity.basic.QmSecurityRealm;
+import com.qm.frame.qmsecurity.basic.QmSecuritySessionRealm;
 import com.qm.frame.qmsecurity.util.QmSecuritySpringApplication;
 
 import java.io.InputStreamReader;
@@ -15,10 +16,18 @@ import java.util.Properties;
  * @date 2018/12/23 18:26
  * @Description 提供给调用者注入使用
  */
-public class QmSercurityContent {
+public class QmSecurityContent {
 
 
     private final static Properties PRO = getProperties();
+
+    public final static String QMSECURITY_TYPE = PRO.getProperty("qmsecurity.type","session");
+
+    public final static Integer SESSION_OUTTIME = Integer.parseInt(PRO.getProperty("session.outTime","1800"));
+
+    public final static String SESSION_LOGIN_OUT_VIEW = PRO.getProperty("session.login.out.view","/jsp/login");
+
+    public final static String SESSION_RIGHTS_ERROR_VIEW = PRO.getProperty("session.rights.error.view","/jsp/error");
 
     public final static String TOKEN_SECRET = PRO.getProperty("token.secret","token_secret");
 
@@ -30,18 +39,32 @@ public class QmSercurityContent {
 
     public final static QmSecurityRealm SECURITY_REALM = getSecurityRealm();
 
+    public final static QmSecuritySessionRealm SECURITY_SESSION_REALM = getSecuritySessionRealm();
     /**
      * 设置自定义的realm
      * realm.class.name
      * @return
      */
     private static QmSecurityRealm getSecurityRealm(){
-        String className = PRO.getProperty("realm.class.name");
-
-        if (className == null || className.trim().equals("")) {
+        String className = PRO.getProperty("token.realm.class.name");
+        if (className == null || QmSecurityContent.QMSECURITY_TYPE.trim().equalsIgnoreCase("token")) {
             return null;
         }
         QmSecurityRealm realm = (QmSecurityRealm) QmSecuritySpringApplication.getBean(className);
+        return realm;
+    }
+
+    /**
+     * 设置自定义的realm
+     * realm.class.name
+     * @return
+     */
+    private static QmSecuritySessionRealm getSecuritySessionRealm(){
+        String className = PRO.getProperty("session.realm.class.name");
+        if (className == null ||  QmSecurityContent.QMSECURITY_TYPE.trim().equalsIgnoreCase("session")) {
+            return null;
+        }
+        QmSecuritySessionRealm realm = (QmSecuritySessionRealm) QmSecuritySpringApplication.getBean(className);
         return realm;
     }
 
