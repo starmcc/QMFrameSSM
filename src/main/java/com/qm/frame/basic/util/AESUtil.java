@@ -25,8 +25,8 @@ public class AESUtil {
     public static String encryptAES(String data) throws Exception {
         Date date = new Date();
         String str = data;
-        for (int i = 0; i < QmFrameContent.REQUEST_BODY_AES_NUMBER; i++){
-            str = encryptAES(str, QmFrameContent.REQUEST_BODY_AES_KEY);
+        for (int i = 0; i < QmFrameContent.AES_BODY_NUMBER; i++){
+            str = encryptAES(str, QmFrameContent.AES_BODY_KEY);
         }
         LOG.debug("加密用时：" + (new Date().getTime() - date.getTime()));
         return str;
@@ -40,8 +40,8 @@ public class AESUtil {
     public static String decryptAES(String data) throws Exception {
         Date date = new Date();
         String str = data;
-        for (int i = 0; i < QmFrameContent.REQUEST_BODY_AES_NUMBER; i++){
-            str = decryptAES(str, QmFrameContent.REQUEST_BODY_AES_KEY);
+        for (int i = 0; i < QmFrameContent.AES_BODY_NUMBER; i++){
+            str = decryptAES(str, QmFrameContent.AES_BODY_KEY);
         }
         LOG.debug("解密用时：" + (new Date().getTime() - date.getTime()));
         return str;
@@ -64,7 +64,7 @@ public class AESUtil {
         SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
-        byte[] encryptedData = cipher.doFinal(data.getBytes(QmFrameContent.REQUEST_BODY_AES_ENCODING));
+        byte[] encryptedData = cipher.doFinal(data.getBytes(QmFrameContent.AES_BODY_ENCODING));
         String hexStr = Base64.encodeBase64String(encryptedData);
         return hexStr;
     }
@@ -89,7 +89,7 @@ public class AESUtil {
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.DECRYPT_MODE, skeySpec);
         byte[] decryptedData = cipher.doFinal(Base64.decodeBase64(data));
-        String respStr = new String(decryptedData, QmFrameContent.REQUEST_BODY_AES_ENCODING);
+        String respStr = new String(decryptedData, QmFrameContent.AES_BODY_ENCODING);
         return respStr;
     }
 

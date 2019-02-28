@@ -93,7 +93,7 @@ public @Component class QmController {
         String value = JSONObject.toJSONString(responseMap, SerializerFeature.WriteMapNullValue);
         value = StringEscapeUtils.unescapeJava(value);
         try {
-            if (QmFrameContent.REQUEST_BODY_AES_START) {
+            if (QmFrameContent.AES_BODY_START) {
                 value = AESUtil.encryptAES(value);
                 Map<String,String> resMap = new HashMap<>();
                 resMap.put(QmFrameContent.RESPONSE_BODY_KEY,value);

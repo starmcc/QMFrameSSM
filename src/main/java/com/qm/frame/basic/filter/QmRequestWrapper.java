@@ -59,7 +59,7 @@ public class QmRequestWrapper extends HttpServletRequestWrapper {
 		if (body == null || body.trim().equals("")) return body;
 		JSONObject jsonObject = JSONObject.parseObject(body);
 		String json = jsonObject.getString(QmFrameContent.REQUEST_BODY_KEY);
-		if (QmFrameContent.REQUEST_BODY_AES_START) {
+		if (QmFrameContent.AES_BODY_START) {
 			try {
 				json = AESUtil.decryptAES(json);
 			} catch (Exception e) {

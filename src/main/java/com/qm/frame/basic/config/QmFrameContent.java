@@ -21,19 +21,19 @@ public class QmFrameContent {
     /**
      * 是否启用AES对称加密传输
      */
-    public final static boolean REQUEST_BODY_AES_START = Boolean.parseBoolean(PRO.getProperty("request.body.aes.start","false"));
+    public final static boolean AES_BODY_START = Boolean.parseBoolean(PRO.getProperty("aes.body.start","false"));
     /**
      * AES秘钥
      */
-    public final static String REQUEST_BODY_AES_KEY = PRO.getProperty("request.body.aes.key","20190101000000qmframe");
+    public final static String AES_BODY_KEY = PRO.getProperty("aes.body.key","20190101000000qmframe");
     /**
      * 统一使用的编码方式
      */
-    public final static String REQUEST_BODY_AES_ENCODING = PRO.getProperty("request.body.aes.encoding","UTF-8");
+    public final static String AES_BODY_ENCODING = PRO.getProperty("aes.body.encoding","UTF-8");
     /**
      * 加密次数
      */
-    public final static int REQUEST_BODY_AES_NUMBER = Integer.parseInt(PRO.getProperty("request.body.aes.number","1"));
+    public final static int AES_BODY_NUMBER = Integer.parseInt(PRO.getProperty("aes.body.number","1"));
     /**
      * 请求数据时，根据该key名解析数据(rest风格)
      */
