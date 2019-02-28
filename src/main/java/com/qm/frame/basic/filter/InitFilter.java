@@ -1,19 +1,16 @@
 package com.qm.frame.basic.filter;
 
-import java.io.IOException;
-import java.util.List;
-
-import javax.servlet.*;
-import javax.servlet.annotation.WebFilter;
-import javax.servlet.http.HttpServletRequest;
-
-import com.qm.frame.basic.config.QmFrameConcent;
+import com.qm.frame.basic.config.QmFrameContent;
+import com.qm.frame.basic.controller.QmController;
+import com.qm.frame.basic.util.QmSpringManager;
 import org.apache.log4j.Logger;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import com.qm.frame.basic.controller.QmCode;
-import com.qm.frame.basic.controller.QmController;
+import javax.servlet.*;
+import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
 /**
  * Copyright © 2018浅梦工作室. All rights reserved.
@@ -36,6 +33,12 @@ public @Component class InitFilter extends QmController implements Filter{
         response.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=utf-8");
         HttpServletRequest req = (HttpServletRequest) request;
+        LOG.info("/n" + "请求URI：" + req.getRequestURI());
+        //特殊请求
+        if (verifySpecialURI(req)) {
+            chain.doFilter(request,response);
+            return;
+        }
         /**
          * 重写RequestBody,并对body进行对称AES解密。
          */
@@ -43,6 +46,19 @@ public @Component class InitFilter extends QmController implements Filter{
         chain.doFilter(requestWrapper, response);
     }
 
+    /**
+     * 验证是否为特殊请求
+     * @param request
+     * @return
+     */
+    private boolean verifySpecialURI(HttpServletRequest request){
+        for (String uri : QmFrameContent.REQUEST_SPECIAL_URI) {
+            if (QmSpringManager.verifyMatchURI(uri,request.getRequestURI())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {

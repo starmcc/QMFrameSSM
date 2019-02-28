@@ -1,7 +1,7 @@
 package com.qm.frame.basic.aop;
 
 
-import com.qm.frame.basic.config.QmFrameConcent;
+import com.qm.frame.basic.config.QmFrameContent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.aspectj.lang.JoinPoint;
@@ -32,8 +32,8 @@ class LoggerWholeAOP {
 	private static QmResponseOut getQmResponseOut(){
 		try {
 			QmResponseOut temp = null;
-			if (StringUtils.isEmpty(QmFrameConcent.LOGGER_AOP_EXTEND_CLASS) == false) {
-				temp = (QmResponseOut) Class.forName(QmFrameConcent.LOGGER_AOP_EXTEND_CLASS).newInstance();
+			if (StringUtils.isEmpty(QmFrameContent.LOGGER_AOP_EXTEND_CLASS) == false) {
+				temp = (QmResponseOut) Class.forName(QmFrameContent.LOGGER_AOP_EXTEND_CLASS).newInstance();
 			}
 			return temp;
 		} catch (Exception e) {}

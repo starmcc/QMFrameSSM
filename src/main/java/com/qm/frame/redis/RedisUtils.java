@@ -1,7 +1,7 @@
 package com.qm.frame.redis;
 
 import com.alibaba.fastjson.JSONObject;
-import com.qm.frame.basic.config.QmFrameConcent;
+import com.qm.frame.basic.config.QmFrameContent;
 import org.apache.log4j.Logger;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -42,7 +42,7 @@ public class RedisUtils {
 			Properties properties = new Properties();
 			// 读取properties文件,使用InputStreamReader字符流防止文件中出现中文导致乱码
 			InputStreamReader inStream = new InputStreamReader
-					(QmFrameConcent.class.getClassLoader().getResourceAsStream("base.properties"),"UTF-8");
+					(QmFrameContent.class.getClassLoader().getResourceAsStream("base.properties"),"UTF-8");
 			properties.load(inStream);
 			inStream.close();
 			return properties;

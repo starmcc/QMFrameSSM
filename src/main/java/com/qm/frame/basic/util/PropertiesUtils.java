@@ -1,11 +1,8 @@
 package com.qm.frame.basic.util;
 
-import com.qm.frame.basic.config.QmFrameConcent;
-import com.qm.frame.basic.exception.QmFrameException;
+import com.qm.frame.basic.config.QmFrameContent;
 
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
 /**
@@ -23,7 +20,7 @@ public class PropertiesUtils {
 			Properties properties = new Properties();
 			// 读取properties文件,使用InputStreamReader字符流防止文件中出现中文导致乱码
 			InputStreamReader inStream = new InputStreamReader
-					(QmFrameConcent.class.getClassLoader().getResourceAsStream(fileName), "UTF-8");
+					(PropertiesUtils.class.getClassLoader().getResourceAsStream(fileName), "UTF-8");
 			properties.load(inStream);
 			inStream.close();
 			return properties;

@@ -5,6 +5,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 
 /**
  * Copyright © 2018浅梦工作室. All rights reserved.
@@ -67,4 +68,14 @@ public class QmSpringManager implements ApplicationContextAware {
         return getApplicationContext().getBean(name, clazz);
     }
 
+    /**
+     * Spring提供的模糊路径匹配算法
+     *
+     * @param matchingUrl 匹配路径
+     * @param requestUrl 请求地址
+     * @return
+     */
+    public static boolean verifyMatchURI(String matchingUrl, String requestUrl) {
+        return new AntPathMatcher().match(matchingUrl, requestUrl);
+    }
 }
